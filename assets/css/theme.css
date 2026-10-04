@@ -1,0 +1,119 @@
+/* ===================================================================
+   Academic Theme System: Forest Green & Soothing Botanical Edition
+   Professionally Elegant, Low-Glare, Eye-Friendly Palette
+   =================================================================== */
+
+:root {
+  /* Typography: Inter body paired with Newsreader editorial serif & JetBrains Mono */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s ease;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --max-width: 1060px;
+}
+
+/* ---------------- Light Theme: Botanical Linen & Oxford Spruce ---------------- */
+[data-theme="light"], :root {
+  /* Soothing, low-glare parchment & sage canvas */
+  --bg-body: #f5f7f4;              /* Soft pearl sage - eliminates harsh white glare */
+  --bg-surface: #ffffff;           /* Clean card canvas */
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #edf2eb;           /* Muted matcha tint */
+  --bg-hover: #e2ebe0;            /* Soft eucalyptus hover */
+  --bg-code: #eaefe8;             /* Gentle code blocks */
+
+  --border-subtle: #dde5db;
+  --border-medium: #c2d1bf;
+  --border-strong: #8da48f;
+
+  /* Soothing typography contrast (Pine Charcoal) */
+  --text-primary: #152219;         /* Deep pine charcoal - gentle on eyes */
+  --text-secondary: #3b4e41;       /* Medium forest slate */
+  --text-muted: #5e7364;          /* Soft moss grey */
+  --text-inverted: #ffffff;
+
+  /* Forest Green Signature Accents */
+  --accent-primary: #1b4931;       /* Deep British Racing / Imperial Forest Green */
+  --accent-hover: #133724;         /* Rich dark pine */
+  --accent-light: #eaf4ee;         /* Ultra-soft jade highlight */
+  --accent-border: #b8dac5;        /* Gentle sage border */
+
+  /* Academic Venue & Tag Badges */
+  --badge-conf-bg: #e1efe6;
+  --badge-conf-text: #1b4d35;
+  --badge-journal-bg: #fdf3dc;
+  --badge-journal-text: #8c5310;
+  --badge-preprint-bg: #ede9f6;
+  --badge-preprint-text: #593f87;
+  --badge-award-bg: #fbf0cf;
+  --badge-award-text: #7b4f0b;
+
+  /* Shadows with organic forest depth */
+  --shadow-sm: 0 1px 3px 0 rgba(21, 34, 25, 0.04);
+  --shadow-md: 0 4px 8px -1px rgba(21, 34, 25, 0.06), 0 2px 4px -2px rgba(21, 34, 25, 0.04);
+  --shadow-lg: 0 12px 20px -4px rgba(21, 34, 25, 0.07), 0 4px 6px -4px rgba(21, 34, 25, 0.03);
+  --shadow-modal: 0 24px 38px -6px rgba(21, 34, 25, 0.16), 0 8px 12px -6px rgba(21, 34, 25, 0.08);
+
+  /* Status indicator */
+  --status-dot: #2d6a4f;
+
+  /* Ambient atmosphere glow */
+  --ambient-glow: radial-gradient(circle at 50% 0%, rgba(45, 106, 79, 0.08) 0%, transparent 65%);
+}
+
+/* ---------------- Dark Theme: Deep Evergreen Night & Luminous Jade ---------------- */
+[data-theme="dark"] {
+  /* Velvety midnight forest */
+  --bg-body: #0b130e;              /* Deep pine night - ultra soothing in dim light */
+  --bg-surface: #111e16;           /* Rich slate moss */
+  --bg-surface-elevated: #16261c;
+  --bg-subtle: #192c21;           /* Deep lichen */
+  --bg-hover: #21382b;            /* Pine hover */
+  --bg-code: #070d0a;             /* Obsidian code background */
+
+  --border-subtle: #203629;
+  --border-medium: #2e4d3b;
+  --border-strong: #456d56;
+
+  /* Glowing text for dark backgrounds */
+  --text-primary: #ecf4ee;         /* Crisp soft mist */
+  --text-secondary: #bad1c1;       /* Light sage */
+  --text-muted: #809c88;          /* Muted fir */
+  --text-inverted: #0b130e;
+
+  /* Luminous Jade & Mint Accents */
+  --accent-primary: #52b788;       /* Luminous calming jade */
+  --accent-hover: #74c69d;         /* Vibrant eucalyptus */
+  --accent-light: rgba(82, 183, 136, 0.14);
+  --accent-border: rgba(82, 183, 136, 0.35);
+
+  /* Tag & Venue badge palettes in dark mode */
+  --badge-conf-bg: rgba(82, 183, 136, 0.16);
+  --badge-conf-text: #95d5b2;
+  --badge-journal-bg: rgba(245, 158, 11, 0.15);
+  --badge-journal-text: #fcd34d;
+  --badge-preprint-bg: rgba(167, 139, 250, 0.16);
+  --badge-preprint-text: #d8b4fe;
+  --badge-award-bg: rgba(234, 179, 8, 0.18);
+  --badge-award-text: #fde047;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 20px -4px rgba(0, 0, 0, 0.65);
+  --shadow-modal: 0 24px 38px -6px rgba(0, 0, 0, 0.85);
+
+  /* Status indicator */
+  --status-dot: #52b788;
+
+  /* Ambient atmosphere glow in dark mode */
+  --ambient-glow: radial-gradient(circle at 50% 0%, rgba(82, 183, 136, 0.08) 0%, transparent 70%);
+}
