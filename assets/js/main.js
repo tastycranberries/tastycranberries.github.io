@@ -19,34 +19,144 @@ document.addEventListener("DOMContentLoaded", () => {
   renderLatexMath();
 });
 
-/* ---------------- Theme Management ---------------- */
+/* ---------------- Theme & Color Palettes System (10 Themes) ---------------- */
+const THEMES = [
+  { id: "light", name: "Forest Sage", shortName: "Sage", color: "#1b4931", mode: "light" },
+  { id: "dark", name: "Evergreen Night", shortName: "Dark", color: "#52b788", mode: "dark" },
+  { id: "ocean", name: "Oxford Ocean", shortName: "Ocean", color: "#1d4ed8", mode: "light" },
+  { id: "midnight", name: "Midnight Sapphire", shortName: "Midnight", color: "#38bdf8", mode: "dark" },
+  { id: "terracotta", name: "Warm Terracotta", shortName: "Terracotta", color: "#c2410c", mode: "light" },
+  { id: "amethyst", name: "Royal Amethyst", shortName: "Amethyst", color: "#c084fc", mode: "dark" },
+  { id: "teal", name: "Emerald Lagoon", shortName: "Teal", color: "#0f766e", mode: "light" },
+  { id: "slate", name: "Nordic Slate", shortName: "Slate", color: "#334155", mode: "light" },
+  { id: "rose", name: "Berry Rose", shortName: "Rose", color: "#be185d", mode: "light" },
+  { id: "amber", name: "Solar Amber", shortName: "Amber", color: "#b45309", mode: "light" }
+];
+
+let activeThemeToastTimeout = null;
+
 function initTheme() {
   const themeToggleBtn = document.getElementById("theme-toggle");
-  const storedTheme = localStorage.getItem("academic-site-theme");
-  const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  
-  const initialTheme = storedTheme ? storedTheme : (systemPrefersDark ? "dark" : "light");
-  setTheme(initialTheme);
+  const paletteBtn = document.getElementById("theme-palette-btn");
+  const switcherGroup = document.getElementById("theme-switcher-group");
+  const swatchesContainer = document.getElementById("palette-swatches-list");
 
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener("click", () => {
-      const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-      const nextTheme = currentTheme === "dark" ? "light" : "dark";
-      setTheme(nextTheme);
+  // Determine initial theme from localStorage or default
+  const storedTheme = localStorage.getItem("academic-site-theme");
+  const initialTheme = storedTheme && THEMES.some(t => t.id === storedTheme) ? storedTheme : "light";
+  setTheme(initialTheme, false);
+
+  // Render swatches into popover
+  if (swatchesContainer) {
+    swatchesContainer.innerHTML = THEMES.map(theme => `
+      <button class="palette-swatch-item ${theme.id === initialTheme ? 'active' : ''}" data-theme-id="${theme.id}" role="menuitem">
+        <div class="swatch-item-left">
+          <span class="swatch-color-pill" style="background-color: ${theme.color};"></span>
+          <span class="swatch-name">${theme.name}</span>
+        </div>
+        <div class="swatch-item-right">
+          <span class="swatch-mode-tag">${theme.mode}</span>
+          <i class="fa-solid fa-check swatch-check"></i>
+        </div>
+      </button>
+    `).join("");
+
+    // Attach click events to swatches
+    swatchesContainer.querySelectorAll(".palette-swatch-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const themeId = item.getAttribute("data-theme-id");
+        setTheme(themeId, true);
+        if (switcherGroup) switcherGroup.classList.remove("open");
+      });
     });
   }
 
-  // Listen to system theme change if no manual preference stored
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
-    if (!localStorage.getItem("academic-site-theme")) {
-      setTheme(e.matches ? "dark" : "light");
+  // Quick Cycle Button: Click to cycle to next theme in sequence
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener("click", () => {
+      const currentId = document.documentElement.getAttribute("data-theme") || "light";
+      const currentIndex = THEMES.findIndex(t => t.id === currentId);
+      const nextIndex = (currentIndex + 1) % THEMES.length;
+      setTheme(THEMES[nextIndex].id, true);
+    });
+  }
+
+  // Palette Menu Toggle Button
+  if (paletteBtn && switcherGroup) {
+    paletteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = switcherGroup.classList.toggle("open");
+      paletteBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  // Close palette on click outside
+  document.addEventListener("click", (e) => {
+    if (switcherGroup && !switcherGroup.contains(e.target)) {
+      switcherGroup.classList.remove("open");
+      if (paletteBtn) paletteBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  // Close palette on Escape
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && switcherGroup && switcherGroup.classList.contains("open")) {
+      switcherGroup.classList.remove("open");
+      if (paletteBtn) paletteBtn.setAttribute("aria-expanded", "false");
     }
   });
 }
 
-function setTheme(theme) {
-  document.documentElement.setAttribute("data-theme", theme);
-  localStorage.setItem("academic-site-theme", theme);
+function setTheme(themeId, showToast = false) {
+  const themeObj = THEMES.find(t => t.id === themeId) || THEMES[0];
+
+  document.documentElement.setAttribute("data-theme", themeObj.id);
+  document.documentElement.setAttribute("data-mode", themeObj.mode);
+  localStorage.setItem("academic-site-theme", themeObj.id);
+
+  // Update button UI
+  const dot = document.getElementById("theme-indicator-dot");
+  if (dot) dot.style.backgroundColor = themeObj.color;
+
+  const btnName = document.getElementById("theme-btn-name");
+  if (btnName) btnName.textContent = themeObj.shortName;
+
+  const themeToggleBtn = document.getElementById("theme-toggle");
+  if (themeToggleBtn) {
+    themeToggleBtn.title = `Current: ${themeObj.name} (Click to switch next)`;
+  }
+
+  // Update active state in popover
+  document.querySelectorAll(".palette-swatch-item").forEach(item => {
+    if (item.getAttribute("data-theme-id") === themeObj.id) {
+      item.classList.add("active");
+    } else {
+      item.classList.remove("active");
+    }
+  });
+
+  // Trigger optional toast feedback
+  if (showToast) {
+    showThemeToast(themeObj);
+  }
+}
+
+function showThemeToast(themeObj) {
+  const existing = document.querySelector(".theme-switch-toast");
+  if (existing) existing.remove();
+  if (activeThemeToastTimeout) clearTimeout(activeThemeToastTimeout);
+
+  const toast = document.createElement("div");
+  toast.className = "theme-switch-toast";
+  toast.innerHTML = `
+    <span class="toast-color-dot" style="background-color: ${themeObj.color};"></span>
+    <span>Theme: ${themeObj.name} (${themeObj.mode.toUpperCase()})</span>
+  `;
+  document.body.appendChild(toast);
+
+  activeThemeToastTimeout = setTimeout(() => {
+    toast.remove();
+  }, 1600);
 }
 
 /* ---------------- Profile & Bio Rendering ---------------- */

@@ -242,37 +242,160 @@
   }
 
   function getPalette() {
-    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-    if (isDark) {
-      return {
-        sky: "#0c1510",
-        distantHill: "#13231a",
-        ground: "#1a3325",
-        grassStalks: "#34734e",
-        treeTrunk: "#4a3525",
-        treeNeedles1: "#234d36",
-        treeNeedles2: "#316b4a",
-        treeHighlight: "#52b788",
-        tireRubber: "#152019",
-        tireRim: "#bad1c1",
-        tireHub: "#52b788",
-        dust: "rgba(140, 180, 155, 0.45)"
-      };
-    } else {
-      return {
-        sky: "#f4f8f4",
-        distantHill: "#c6ded0",
-        ground: "#457b58",
-        grassStalks: "#2a593c",
-        treeTrunk: "#5c4033",
-        treeNeedles1: "#1b4d32",
-        treeNeedles2: "#2d6b47",
-        treeHighlight: "#74c69d",
-        tireRubber: "#1f2b23",
-        tireRim: "#e2ede6",
-        tireHub: "#1b4931",
-        dust: "rgba(110, 155, 125, 0.45)"
-      };
+    const theme = document.documentElement.getAttribute("data-theme") || "light";
+
+    switch (theme) {
+      case "dark":
+        return {
+          sky: "#0c1510",
+          distantHill: "#13231a",
+          ground: "#1a3325",
+          grassStalks: "#34734e",
+          treeTrunk: "#4a3525",
+          treeNeedles1: "#234d36",
+          treeNeedles2: "#316b4a",
+          treeHighlight: "#52b788",
+          tireRubber: "#152019",
+          tireRim: "#bad1c1",
+          tireHub: "#52b788",
+          dust: "rgba(140, 180, 155, 0.45)"
+        };
+      case "midnight":
+        return {
+          sky: "#070c17",
+          distantHill: "#0f1c33",
+          ground: "#162744",
+          grassStalks: "#38bdf8",
+          treeTrunk: "#303d52",
+          treeNeedles1: "#1d3860",
+          treeNeedles2: "#2a4c80",
+          treeHighlight: "#7dd3fc",
+          tireRubber: "#0d1522",
+          tireRim: "#cbd5e1",
+          tireHub: "#38bdf8",
+          dust: "rgba(56, 189, 248, 0.4)"
+        };
+      case "amethyst":
+        return {
+          sky: "#0e0917",
+          distantHill: "#1c122e",
+          ground: "#291942",
+          grassStalks: "#a855f7",
+          treeTrunk: "#3b2650",
+          treeNeedles1: "#3c2263",
+          treeNeedles2: "#582f91",
+          treeHighlight: "#c084fc",
+          tireRubber: "#160f24",
+          tireRim: "#ddd6fe",
+          tireHub: "#c084fc",
+          dust: "rgba(192, 132, 252, 0.4)"
+        };
+      case "ocean":
+        return {
+          sky: "#f0f6fc",
+          distantHill: "#cbdff5",
+          ground: "#3b82f6",
+          grassStalks: "#1d4ed8",
+          treeTrunk: "#5a4332",
+          treeNeedles1: "#1e3a8a",
+          treeNeedles2: "#2563eb",
+          treeHighlight: "#93c5fd",
+          tireRubber: "#1e293b",
+          tireRim: "#e2e8f0",
+          tireHub: "#1d4ed8",
+          dust: "rgba(59, 130, 246, 0.4)"
+        };
+      case "terracotta":
+        return {
+          sky: "#fbf3eb",
+          distantHill: "#f5d4be",
+          ground: "#c2410c",
+          grassStalks: "#9a3412",
+          treeTrunk: "#543320",
+          treeNeedles1: "#832e0c",
+          treeNeedles2: "#b43d0e",
+          treeHighlight: "#fb923c",
+          tireRubber: "#2c1c14",
+          tireRim: "#ffedd5",
+          tireHub: "#ea580c",
+          dust: "rgba(234, 88, 12, 0.4)"
+        };
+      case "teal":
+        return {
+          sky: "#edf8f6",
+          distantHill: "#b9e9e1",
+          ground: "#0f766e",
+          grassStalks: "#115e59",
+          treeTrunk: "#423b32",
+          treeNeedles1: "#134e4a",
+          treeNeedles2: "#0d9488",
+          treeHighlight: "#5eead4",
+          tireRubber: "#132523",
+          tireRim: "#ccfbf1",
+          tireHub: "#14b8a6",
+          dust: "rgba(13, 148, 136, 0.4)"
+        };
+      case "slate":
+        return {
+          sky: "#f1f5f9",
+          distantHill: "#cbd5e1",
+          ground: "#475569",
+          grassStalks: "#334155",
+          treeTrunk: "#3b3d42",
+          treeNeedles1: "#1e293b",
+          treeNeedles2: "#334155",
+          treeHighlight: "#94a3b8",
+          tireRubber: "#0f172a",
+          tireRim: "#e2e8f0",
+          tireHub: "#475569",
+          dust: "rgba(100, 116, 139, 0.4)"
+        };
+      case "rose":
+        return {
+          sky: "#fdf1f3",
+          distantHill: "#fbcad2",
+          ground: "#be185d",
+          grassStalks: "#9f1239",
+          treeTrunk: "#4a2d34",
+          treeNeedles1: "#831843",
+          treeNeedles2: "#db2777",
+          treeHighlight: "#f472b6",
+          tireRubber: "#241318",
+          tireRim: "#ffe4e6",
+          tireHub: "#e11d48",
+          dust: "rgba(225, 29, 72, 0.4)"
+        };
+      case "amber":
+        return {
+          sky: "#fcf6e8",
+          distantHill: "#fde3a4",
+          ground: "#b45309",
+          grassStalks: "#92400e",
+          treeTrunk: "#543d22",
+          treeNeedles1: "#78350f",
+          treeNeedles2: "#d97706",
+          treeHighlight: "#fcd34d",
+          tireRubber: "#291f0f",
+          tireRim: "#fef3c7",
+          tireHub: "#d97706",
+          dust: "rgba(217, 119, 6, 0.4)"
+        };
+      case "light":
+      default:
+        return {
+          sky: "#f4f8f4",
+          distantHill: "#c6ded0",
+          ground: "#457b58",
+          grassStalks: "#2a593c",
+          treeTrunk: "#5c4033",
+          treeNeedles1: "#1b4d32",
+          treeNeedles2: "#2d6b47",
+          treeHighlight: "#74c69d",
+          tireRubber: "#1f2b23",
+          tireRim: "#e2ede6",
+          tireHub: "#1b4931",
+          dust: "rgba(110, 155, 125, 0.45)"
+        };
     }
   }
 

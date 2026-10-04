@@ -55,11 +55,28 @@
       </nav>
 
       <div class="header-actions">
-        <!-- Theme Switcher Button -->
-        <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme" title="Toggle Light/Dark Theme">
-          <i class="fa-solid fa-moon dark-icon"></i>
-          <i class="fa-solid fa-sun light-icon"></i>
-        </button>
+        <!-- Theme & Color Switcher (10 Themes) -->
+        <div class="theme-switcher-group" id="theme-switcher-group">
+          <button id="theme-toggle" class="theme-btn" aria-label="Cycle theme color" title="Switch Theme Color (Click to cycle)">
+            <span class="theme-btn-dot" id="theme-indicator-dot"></span>
+            <i class="fa-solid fa-palette"></i>
+            <span class="theme-btn-name" id="theme-btn-name">Sage</span>
+          </button>
+          <button id="theme-palette-btn" class="theme-palette-btn" aria-label="Open theme palette menu" title="View all 10 theme colors" aria-haspopup="true" aria-expanded="false">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+
+          <!-- Palette Dropdown Popover -->
+          <div class="theme-palette-popover" id="theme-palette-popover" aria-hidden="true" role="menu">
+            <div class="palette-popover-header">
+              <span class="palette-popover-title"><i class="fa-solid fa-swatchbook"></i> Color Palettes</span>
+              <span class="palette-popover-count">10 Themes</span>
+            </div>
+            <div class="palette-swatches-list" id="palette-swatches-list">
+              <!-- Rendered dynamically by main.js -->
+            </div>
+          </div>
+        </div>
 
         <!-- Mobile Navigation Toggle -->
         <button id="mobile-menu-toggle" class="mobile-toggle" aria-label="Toggle navigation menu">
