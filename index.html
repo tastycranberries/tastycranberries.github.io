@@ -210,7 +210,7 @@
           </div>
 
           <!-- 6. Academic Service & Honors Tile -->
-          <div class="metro-tile tile-service" data-section="service" tabindex="0" role="button" aria-label="Open Academic Service and Honors">
+          <div class="metro-tile tile-wide tile-service" data-section="service" tabindex="0" role="button" aria-label="Open Academic Service and Honors">
             <div class="tile-icon-badge">
               <i class="fa-solid fa-award"></i>
             </div>
@@ -222,6 +222,23 @@
             <div class="tile-footer">
               <span class="tile-badge">Peer Review & Honors</span>
               <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+            <div class="tile-accent-glow"></div>
+          </div>
+
+          <!-- 7. Games Tile (Tree Jump Minigame) -->
+          <div class="metro-tile tile-games" data-section="games" id="tile-games-launch" tabindex="0" role="button" aria-label="Play Tree Jump Minigame">
+            <div class="tile-icon-badge">
+              <i class="fa-solid fa-gamepad"></i>
+            </div>
+            <div class="tile-content">
+              <span class="tile-kicker">Minigame</span>
+              <h3 class="tile-title">Games</h3>
+              <p class="tile-teaser">Play <strong>"Tree Jump"</strong> — Leap rolling tire over pine &amp; evergreen trees!</p>
+            </div>
+            <div class="tile-footer">
+              <span class="tile-badge badge-pulse"><i class="fa-solid fa-play"></i> Pop-Up Game</span>
+              <span class="tile-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
             </div>
             <div class="tile-accent-glow"></div>
           </div>
@@ -401,6 +418,85 @@
     </div>
   </div>
 
+  <!-- ===================================================================
+       TREE JUMP MINIGAME MODAL
+       Dedicated pop-up minigame window keeping the main site clean
+       =================================================================== -->
+  <div id="tree-jump-modal" class="modal-backdrop treejump-modal" aria-hidden="true" role="dialog" aria-labelledby="treejump-title">
+    <div class="modal-container treejump-modal-container">
+      <div class="modal-header treejump-modal-header">
+        <div class="treejump-header-title">
+          <i class="fa-solid fa-tree text-forest"></i>
+          <h3 id="treejump-title" class="modal-title">Tree Jump</h3>
+          <span class="treejump-tag">Forest Minigame</span>
+        </div>
+        <div class="treejump-header-controls">
+          <div id="treejump-hud" class="treejump-hud" style="display: none;">
+            <div class="treejump-hud-stat">
+              <span class="treejump-hud-label">SCORE</span>
+              <span id="treejump-score-val" class="treejump-hud-val">0000</span>
+            </div>
+            <div class="treejump-hud-stat">
+              <span class="treejump-hud-label">HI</span>
+              <span id="treejump-high-score-val" class="treejump-hud-val">0000</span>
+            </div>
+          </div>
+          <button class="modal-close" id="treejump-close-btn" aria-label="Close Tree Jump game">&times;</button>
+        </div>
+      </div>
+
+      <div class="modal-body treejump-modal-body">
+        <div class="treejump-canvas-wrapper">
+          <canvas id="tree-jump-canvas"></canvas>
+
+          <!-- Start Overlay Dialog -->
+          <div id="treejump-start-dialog" class="treejump-overlay-panel">
+            <div class="treejump-panel-card">
+              <div class="treejump-badge"><i class="fa-solid fa-tree"></i> ARCADE</div>
+              <h2 class="treejump-card-title">Tree Jump</h2>
+              <p class="treejump-card-desc">
+                Roll down the hills and leap over forest trees of different sizes!
+              </p>
+              <div class="treejump-instructions">
+                <span class="instruction-key"><i class="fa-solid fa-arrow-pointer"></i> Tap / Click</span>
+                <span class="instruction-divider">or</span>
+                <span class="instruction-key"><i class="fa-regular fa-keyboard"></i> Spacebar / &uarr;</span>
+              </div>
+              <button id="btn-treejump-start" class="btn btn-primary treejump-action-btn">
+                <i class="fa-solid fa-play"></i> Start Rolling
+              </button>
+            </div>
+          </div>
+
+          <!-- Game Over Overlay Dialog -->
+          <div id="treejump-gameover-dialog" class="treejump-overlay-panel" style="display: none;">
+            <div class="treejump-panel-card">
+              <div class="treejump-badge badge-gameover">GAME OVER</div>
+              <h2 class="treejump-card-title">You Hit a Tree!</h2>
+              <div class="treejump-results-grid">
+                <div class="treejump-result-box">
+                  <span class="treejump-result-label">FINAL SCORE</span>
+                  <span id="treejump-final-score" class="treejump-result-val">0</span>
+                </div>
+                <div class="treejump-result-box">
+                  <span class="treejump-result-label">BEST RECORD</span>
+                  <span id="treejump-best-score" class="treejump-result-val">0</span>
+                </div>
+              </div>
+              <button id="btn-treejump-restart" class="btn btn-primary treejump-action-btn">
+                <i class="fa-solid fa-rotate-right"></i> Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="treejump-footer-hint">
+          <span><i class="fa-solid fa-circle-info"></i> Click or tap anywhere inside the canvas or press <strong>Spacebar</strong> to jump.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="site-footer">
     <div class="page-container footer-content">
@@ -419,6 +515,6 @@
   <!-- Scripts -->
   <script src="assets/js/content.js"></script>
   <script src="assets/js/main.js"></script>
-  <script src="assets/js/nature.js"></script>
+  <script src="assets/js/treejump.js"></script>
 </body>
 </html>

@@ -492,6 +492,25 @@ function initTilesHub() {
   // Handle Tile Clicks
   tiles.forEach(tile => {
     const section = tile.getAttribute("data-section");
+
+    if (section === "games") {
+      tile.addEventListener("click", () => {
+        if (typeof window.openTreeJumpModal === "function") {
+          window.openTreeJumpModal();
+        }
+      });
+
+      tile.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (typeof window.openTreeJumpModal === "function") {
+            window.openTreeJumpModal();
+          }
+        }
+      });
+      return;
+    }
+
     tile.addEventListener("click", () => {
       openDetailSection(section, true);
     });
