@@ -9,10 +9,10 @@
 
 const ACADEMIC_PROFILE = {
   // ---------------- Basic Info ----------------
-  name: "Dr. Alex Vance",
-  initials: "AV",
+  name: "Shailendra Dabral",
+  initials: "SD",
   role: "Postdoctoral Research Fellow in Computer Science",
-  affiliation: "Stanford Vision & Learning Lab, Stanford University",
+  affiliation: "Indian Institute of Technology Indore",
   affiliationUrl: "https://stanford.edu",
   status: "Open to Research Collaborations & Academic Roles",
   avatar: "assets/img/avatar-placeholder.svg",
