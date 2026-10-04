@@ -13,8 +13,8 @@ const ACADEMIC_PROFILE = {
   initials: "SD",
   role: "Postdoctoral Research Fellow in Computer Science",
   affiliation: "S.A.R Lab, Indian Institute of Technology",
-  affiliationUrl: "https://stanford.edu",
-  status: "Open to Research Collaborations & Academic Roles",
+  affiliationUrl: "https://iiti.ac.in",
+  status: "Freelancer",
   avatar: "assets/img/avatar-placeholder.svg",
 
   // ---------------- Bio & Research Statement ----------------
