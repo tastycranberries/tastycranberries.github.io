@@ -11,7 +11,7 @@ const ACADEMIC_PROFILE = {
   // ---------------- Basic Info ----------------
   name: "Shailendra Dabral",
   initials: "SD",
-  role: "Postdoctoral Research Fellow in Computer Science",
+  role: "MS Research student in Astronomy Astrophysics and Space Engineering",
   affiliation: "S.A.R Lab, Indian Institute of Technology",
   affiliationUrl: "https://iiti.ac.in",
   status: "Freelancer",
@@ -20,7 +20,7 @@ const ACADEMIC_PROFILE = {
   // ---------------- Bio & Research Statement ----------------
   // HTML or string paragraphs are supported
   bio: [
-    "I am a Postdoctoral Fellow at the <strong>Stanford Vision & Learning Lab</strong>, working at the intersection of <em>Foundation Models</em>, <em>Multi-Agent Reinforcement Learning</em>, and <em>Embodied Decision Making</em>. Prior to Stanford, I completed my Ph.D. in Computer Science at Carnegie Mellon University.",
+    "I am currently freelancer working on the project of Scientific Machine learning, previous research student in <strong>S.A.R Lab (IIT Indore)</strong>, working at the intersection of <em>Physics</em>, <em>Machine Learning</em>, and <em> Applied Mathematics</em>. Prior to IIT Indore, I completed my Masters in Physics at Hemwati Nandan Bahuguna University.",
     "My long-term research mission is to develop adaptive, sample-efficient reasoning systems that can plan over long horizons, collaborate with humans, and continually generalize to open-world physical and digital environments without catastrophic forgetting."
   ],
 
