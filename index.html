@@ -1,537 +1,201 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dr. Alex Vance | Academic Researcher</title>
-  <meta name="description" content="Personal academic website of Dr. Alex Vance - Research in Machine Learning, Foundation Models, and Multi-Agent Systems.">
-  <meta name="author" content="Dr. Alex Vance">
-
-  <!-- Open Graph / Social Sharing Meta -->
-  <meta property="og:title" content="Dr. Alex Vance | Academic Researcher">
-  <meta property="og:description" content="Personal academic website, research publications, news, and curriculum vitae.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shailendra Dabral</title>
+  <meta name="description" content="Shailendra Dabral: research in astronomy, astrophysics and scientific machine learning. Publications, news, experience and CV.">
+  <meta name="author" content="Shailendra Dabral">
+  <meta property="og:title" content="Shailendra Dabral">
+  <meta property="og:description" content="Research in astronomy, astrophysics and scientific machine learning.">
   <meta property="og:type" content="website">
-
-  <!-- Favicon -->
+  <meta name="color-scheme" content="light dark">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
-  <!-- Google Fonts: Inter & Newsreader (Academic Editorial Serif Accent) -->
+  <!-- Set the saved reading mode before paint to avoid a flash -->
+  <script>
+    (function () {
+      try {
+        var m = localStorage.getItem("site-mode");
+        if (!m) m = matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day";
+        document.documentElement.setAttribute("data-mode", m);
+      } catch (e) { document.documentElement.setAttribute("data-mode", "day"); }
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..650&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
 
-  <!-- KaTeX for LaTeX Math in Titles & Abstracts -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
 
-  <!-- Core & Theme Stylesheets -->
-  <link rel="stylesheet" href="assets/css/theme.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+  <a class="skip-link" href="#about">Skip to content</a>
 
-  <!-- Navigation Bar -->
-  <header class="site-header" id="site-header">
-    <div class="header-container">
-      <a href="#about" class="brand-logo" id="brand-home-link">
-        <span class="brand-initials">AV</span>
-        <span class="brand-name" id="nav-brand-name">Alex Vance</span>
+  <header class="topbar" id="topbar">
+    <div class="topbar-inner">
+      <a href="#top" class="brand">
+        <span class="brand-mark" id="brand-initials" aria-hidden="true">SD</span>
+        <span class="brand-name" id="brand-name">Shailendra Dabral</span>
       </a>
-
-      <!-- Quick Nav Links that open matching tile views -->
-      <nav class="site-nav" id="site-nav">
-        <ul class="nav-links">
-          <li><a href="#about" class="nav-link" data-target="about">Overview</a></li>
-          <li><a href="#news" class="nav-link" data-target="news">News</a></li>
-          <li><a href="#publications" class="nav-link" data-target="publications">Publications</a></li>
-          <li><a href="#experience" class="nav-link" data-target="experience">Experience</a></li>
-          <li><a href="#teaching" class="nav-link" data-target="teaching">Teaching</a></li>
-          <li><a href="#service" class="nav-link" data-target="service">Service</a></li>
-        </ul>
+      <nav class="site-nav" aria-label="Sections">
+        <a href="#about">About</a>
+        <a href="#research">Research</a>
+        <a href="#publications">Publications</a>
+        <a href="#news">News</a>
+        <a href="#experience">Experience</a>
+        <a href="#teaching">Teaching</a>
+        <a href="#service">Service</a>
+        <a href="#contact">Contact</a>
       </nav>
-
-      <div class="header-actions">
-        <!-- Theme & Color Switcher (10 Themes) -->
-        <div class="theme-switcher-group" id="theme-switcher-group">
-          <button id="theme-toggle" class="theme-btn" aria-label="Cycle theme color" title="Switch Theme Color (Click to cycle)">
-            <span class="theme-btn-dot" id="theme-indicator-dot"></span>
-            <i class="fa-solid fa-palette"></i>
-            <span class="theme-btn-name" id="theme-btn-name">Sage</span>
-          </button>
-          <button id="theme-palette-btn" class="theme-palette-btn" aria-label="Open theme palette menu" title="View all 10 theme colors" aria-haspopup="true" aria-expanded="false">
-            <i class="fa-solid fa-chevron-down"></i>
-          </button>
-
-          <!-- Palette Dropdown Popover -->
-          <div class="theme-palette-popover" id="theme-palette-popover" aria-hidden="true" role="menu">
-            <div class="palette-popover-header">
-              <span class="palette-popover-title"><i class="fa-solid fa-swatchbook"></i> Color Palettes</span>
-              <span class="palette-popover-count">10 Themes</span>
-            </div>
-            <div class="palette-swatches-list" id="palette-swatches-list">
-              <!-- Rendered dynamically by main.js -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile Navigation Toggle -->
-        <button id="mobile-menu-toggle" class="mobile-toggle" aria-label="Toggle navigation menu">
-          <i class="fa-solid fa-bars"></i>
-        </button>
-      </div>
+      <button class="mode-toggle" id="mode-toggle" type="button" aria-pressed="false" title="Red-light mode keeps your eyes dark-adapted, the way observatories do">
+        <span class="mode-icon" aria-hidden="true"></span>
+        <span class="mode-label">Red light</span>
+      </button>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="main-content">
-    <div class="page-container">
-      
-      <!-- HERO / ABOUT SECTION (Clean, Welcoming Profile) -->
-      <section id="about" class="section hero-section">
-        <div class="hero-grid">
-          <div class="hero-avatar-col">
-            <div class="avatar-wrapper">
-              <img id="profile-avatar" src="assets/img/avatar-placeholder.svg" alt="Profile Headshot" class="profile-avatar">
-              <div class="avatar-ring"></div>
-            </div>
-            <div class="hero-status-pill">
-              <span class="status-indicator"></span>
-              <span id="profile-status">Seeking Collaborations & Postdocs</span>
-            </div>
-          </div>
-
-          <div class="hero-text-col">
-            <div class="hero-titles">
-              <h1 id="profile-name" class="profile-name">Shailendra Dabral</h1>
-              <h2 id="profile-role" class="profile-role">Postdoctoral Research Fellow in Computer Science</h2>
-              <div class="affiliation-badge">
-                <i class="fa-solid fa-building-columns"></i>
-                <span id="profile-affiliation">Stanford Vision & Learning Lab, Stanford University</span>
-              </div>
-            </div>
-
-            <div id="profile-bio" class="profile-bio">
-              <!-- Rendered dynamically from content.js -->
-            </div>
-
-            <!-- Social and Academic Links -->
-            <div class="hero-social-links" id="profile-links">
-              <!-- Populated dynamically from content.js -->
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ===================================================================
-           INTERACTIVE WINDOWS 8 METRO TILES DASHBOARD HUB
-           Ultra-clean initial view: click any tile to open detailed panel below
-           =================================================================== -->
-      <section id="hub-section" class="section hub-section">
-        <div class="section-header hub-header">
-          <div class="section-title-wrap">
-            <span class="section-kicker">Interactive Hub</span>
-            <h2 class="section-title">Explore Academic Record</h2>
-          </div>
-          <p class="section-subtitle">Select any section tile below to open its detailed view.</p>
-        </div>
-
-        <div class="metro-tiles-grid" id="metro-tiles-grid">
-          
-          <!-- 1. Publications Tile (Wide / Featured) -->
-          <div class="metro-tile tile-wide tile-publications" data-section="publications" tabindex="0" role="button" aria-label="Open Publications and Preprints">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-book-open"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Scholarship</span>
-              <h3 class="tile-title">Publications & Preprints</h3>
-              <p class="tile-teaser" id="tile-teaser-publications">5 Papers · 1 NeurIPS Oral · 1 ICML Spotlight</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge"><span id="tile-count-pubs">5</span> Papers</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 2. Latest News Tile -->
-          <div class="metro-tile tile-news" data-section="news" tabindex="0" role="button" aria-label="Open Latest News">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-bullhorn"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Updates</span>
-              <h3 class="tile-title">Latest News</h3>
-              <p class="tile-teaser" id="tile-teaser-news">Paper accepted to NeurIPS 2026 (Oral)</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge badge-pulse"><span id="tile-count-news">5</span> Updates</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 3. Experience & Education Tile -->
-          <div class="metro-tile tile-experience" data-section="experience" tabindex="0" role="button" aria-label="Open Experience and Education">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-briefcase"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Trajectory</span>
-              <h3 class="tile-title">Experience & Education</h3>
-              <p class="tile-teaser" id="tile-teaser-experience">Stanford Postdoc · Ph.D. CMU · UW</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge">Timeline</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 4. Research Focus Tile -->
-          <div class="metro-tile tile-research" data-section="research" tabindex="0" role="button" aria-label="Open Research Focus">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-brain"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Interests</span>
-              <h3 class="tile-title">Research Focus</h3>
-              <p class="tile-teaser" id="tile-teaser-research">Embodied AI · Multi-Agent Systems · Self-Supervised Learning</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge">3 Core Themes</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 5. Teaching & Mentoring Tile -->
-          <div class="metro-tile tile-teaching" data-section="teaching" tabindex="0" role="button" aria-label="Open Teaching and Mentoring">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-chalkboard-user"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Pedagogy</span>
-              <h3 class="tile-title">Teaching & Mentoring</h3>
-              <p class="tile-teaser" id="tile-teaser-teaching">CS 234 (Reinforcement Learning), CS 15-780, CS 15-281</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge">3 Courses</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 6. Academic Service & Honors Tile -->
-          <div class="metro-tile tile-wide tile-service" data-section="service" tabindex="0" role="button" aria-label="Open Academic Service and Honors">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-award"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Community</span>
-              <h3 class="tile-title">Service & Honors</h3>
-              <p class="tile-teaser" id="tile-teaser-service">NeurIPS, ICML, ICLR Reviewer · 5 Major Awards</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge">Peer Review & Honors</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-right"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-          <!-- 7. Games Tile (Tree Jump Minigame) -->
-          <div class="metro-tile tile-games" data-section="games" id="tile-games-launch" tabindex="0" role="button" aria-label="Play Tree Jump Minigame">
-            <div class="tile-icon-badge">
-              <i class="fa-solid fa-gamepad"></i>
-            </div>
-            <div class="tile-content">
-              <span class="tile-kicker">Minigame</span>
-              <h3 class="tile-title">Games</h3>
-              <p class="tile-teaser">Play <strong>"Tree Jump"</strong> — Leap rolling tire over pine &amp; evergreen trees!</p>
-            </div>
-            <div class="tile-footer">
-              <span class="tile-badge badge-pulse"><i class="fa-solid fa-play"></i> Pop-Up Game</span>
-              <span class="tile-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
-            </div>
-            <div class="tile-accent-glow"></div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- ===================================================================
-           DETAILED VIEW STAGE
-           Dynamically revealed when a tile is selected with smooth animations
-           =================================================================== -->
-      <div id="details-stage" class="details-stage" aria-live="polite">
-        
-        <!-- Sticky / Floating Navigation Controls for Detailed View -->
-        <div class="details-stage-header">
-          <button id="btn-back-to-tiles" class="btn-back-tiles">
-            <i class="fa-solid fa-arrow-left"></i>
-            <span>Back to All Tiles</span>
-          </button>
-
-          <!-- Quick switcher pills to jump between sections directly -->
-          <div class="stage-nav-pills" id="stage-nav-pills">
-            <button class="stage-pill" data-target="publications"><i class="fa-solid fa-book-open"></i> Publications</button>
-            <button class="stage-pill" data-target="news"><i class="fa-solid fa-bullhorn"></i> News</button>
-            <button class="stage-pill" data-target="experience"><i class="fa-solid fa-briefcase"></i> Experience</button>
-            <button class="stage-pill" data-target="research"><i class="fa-solid fa-brain"></i> Research</button>
-            <button class="stage-pill" data-target="teaching"><i class="fa-solid fa-chalkboard-user"></i> Teaching</button>
-            <button class="stage-pill" data-target="service"><i class="fa-solid fa-award"></i> Service</button>
-          </div>
-        </div>
-
-        <!-- 1. DETAIL PANEL: PUBLICATIONS -->
-        <div id="panel-publications" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Scholarship</span>
-              <h2 class="panel-title">Publications & Preprints</h2>
-            </div>
-            <span class="panel-count-tag" id="panel-pub-counter">5 Papers</span>
-          </div>
-
-          <div class="publication-controls">
-            <div class="filter-tabs" id="publication-filters">
-              <button class="filter-tab active" data-filter="all">All (<span id="count-all">0</span>)</button>
-              <button class="filter-tab" data-filter="conference">Conference (<span id="count-conf">0</span>)</button>
-              <button class="filter-tab" data-filter="journal">Journal (<span id="count-journal">0</span>)</button>
-              <button class="filter-tab" data-filter="preprint">Preprints (<span id="count-preprint">0</span>)</button>
-            </div>
-            
-            <div class="pub-search-box">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" id="pub-search" placeholder="Search by title, keyword, or venue..." aria-label="Search publications">
-            </div>
-          </div>
-
-          <div class="publications-list" id="publications-list">
-            <!-- Populated dynamically from content.js -->
-          </div>
-        </div>
-
-        <!-- 2. DETAIL PANEL: NEWS -->
-        <div id="panel-news" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Timeline</span>
-              <h2 class="panel-title">News & Announcements</h2>
-            </div>
-            <span class="panel-count-tag" id="panel-news-counter">Recent updates</span>
-          </div>
-
-          <div class="news-timeline" id="news-timeline">
-            <!-- Populated dynamically from content.js -->
-          </div>
-        </div>
-
-        <!-- 3. DETAIL PANEL: EXPERIENCE & EDUCATION -->
-        <div id="panel-experience" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Trajectory</span>
-              <h2 class="panel-title">Experience & Education</h2>
-            </div>
-          </div>
-
-          <div class="two-column-timeline">
-            <div class="timeline-column">
-              <h3 class="column-heading"><i class="fa-solid fa-briefcase"></i> Experience</h3>
-              <div class="timeline" id="experience-timeline">
-                <!-- Populated dynamically from content.js -->
-              </div>
-            </div>
-
-            <div class="timeline-column">
-              <h3 class="column-heading"><i class="fa-solid fa-graduation-cap"></i> Education</h3>
-              <div class="timeline" id="education-timeline">
-                <!-- Populated dynamically from content.js -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. DETAIL PANEL: RESEARCH FOCUS -->
-        <div id="panel-research" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Interests</span>
-              <h2 class="panel-title">Research Focus & Themes</h2>
-            </div>
-          </div>
-
-          <div class="research-grid" id="research-grid">
-            <!-- Populated dynamically from content.js -->
-          </div>
-        </div>
-
-        <!-- 5. DETAIL PANEL: TEACHING & MENTORING -->
-        <div id="panel-teaching" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Pedagogy</span>
-              <h2 class="panel-title">Teaching & Mentoring</h2>
-            </div>
-          </div>
-
-          <div class="teaching-grid" id="teaching-grid">
-            <!-- Populated dynamically from content.js -->
-          </div>
-        </div>
-
-        <!-- 6. DETAIL PANEL: SERVICE & HONORS -->
-        <div id="panel-service" class="detail-panel">
-          <div class="panel-heading-bar">
-            <div>
-              <span class="section-kicker">Community</span>
-              <h2 class="panel-title">Academic Service & Honors</h2>
-            </div>
-          </div>
-
-          <div class="service-grid">
-            <div class="service-card" id="service-reviewing-card">
-              <h3><i class="fa-solid fa-clipboard-check"></i> Peer Review & Program Committees</h3>
-              <ul class="styled-list" id="reviewing-list">
-                <!-- Populated dynamically from content.js -->
-              </ul>
-            </div>
-
-            <div class="service-card" id="service-honors-card">
-              <h3><i class="fa-solid fa-award"></i> Honors, Grants & Fellowships</h3>
-              <ul class="styled-list" id="honors-list">
-                <!-- Populated dynamically from content.js -->
-              </ul>
-            </div>
-          </div>
-        </div>
-
+  <!-- Hero: an interactive star atlas plate centred on Orion -->
+  <section class="hero" id="top" aria-labelledby="profile-name">
+    <canvas class="sky" id="sky" role="img" aria-label="Star chart of the Orion region. Move across it to read sky coordinates and identify bright stars."></canvas>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <h1 class="hero-name" id="profile-name">Shailendra Dabral</h1>
+        <p class="hero-role" id="profile-role"></p>
+        <p class="hero-meta">
+          <a id="profile-affiliation" class="hero-affil" href="#"></a>
+          <span class="hero-status" id="profile-status"></span>
+        </p>
       </div>
-
+      <div class="readout" id="readout" aria-live="off">
+        <div class="readout-coords">
+          <span><span class="readout-k">RA</span> <span id="ro-ra">5h 35m 00s</span></span>
+          <span><span class="readout-k">Dec</span> <span id="ro-dec">+0° 00′</span></span>
+        </div>
+        <div class="readout-target" id="ro-target">Move across the chart to read coordinates</div>
+      </div>
     </div>
+  </section>
+
+  <main class="page" id="main">
+
+    <section class="sec" id="about" aria-labelledby="h-about">
+      <h2 class="sec-title" id="h-about">About</h2>
+      <div class="sec-body">
+        <div class="about">
+          <img id="profile-avatar" class="avatar" src="assets/img/avatar-placeholder.svg" alt="" width="104" height="104">
+          <div class="bio" id="profile-bio"></div>
+        </div>
+        <ul class="profile-links" id="profile-links"></ul>
+      </div>
+    </section>
+
+    <section class="sec" id="research" aria-labelledby="h-research">
+      <h2 class="sec-title" id="h-research">Research</h2>
+      <div class="sec-body">
+        <div class="research-list" id="research-list"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="publications" aria-labelledby="h-pubs">
+      <h2 class="sec-title" id="h-pubs">Publications</h2>
+      <div class="sec-body">
+        <div class="pub-tools">
+          <div class="segmented" id="pub-filters" role="group" aria-label="Filter publications by type">
+            <button type="button" data-filter="all" aria-pressed="true">All <span class="count" data-count="all"></span></button>
+            <button type="button" data-filter="conference" aria-pressed="false">Conference <span class="count" data-count="conference"></span></button>
+            <button type="button" data-filter="journal" aria-pressed="false">Journal <span class="count" data-count="journal"></span></button>
+            <button type="button" data-filter="preprint" aria-pressed="false">Preprint <span class="count" data-count="preprint"></span></button>
+          </div>
+          <label class="search">
+            <span class="visually-hidden">Search publications</span>
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" id="pub-search" placeholder="Search titles, venues, authors" autocomplete="off">
+            <kbd aria-hidden="true">/</kbd>
+          </label>
+        </div>
+        <p class="pub-status" id="pub-status" aria-live="polite"></p>
+        <div class="pub-list" id="pub-list"></div>
+      </div>
+    </section>
+
+    <section class="sec" id="news" aria-labelledby="h-news">
+      <h2 class="sec-title" id="h-news">News</h2>
+      <div class="sec-body">
+        <ol class="entries" id="news-list"></ol>
+        <button type="button" class="text-btn" id="news-more" hidden></button>
+      </div>
+    </section>
+
+    <section class="sec" id="experience" aria-labelledby="h-exp">
+      <h2 class="sec-title" id="h-exp">Experience</h2>
+      <div class="sec-body">
+        <div class="segmented" role="tablist" aria-label="Experience or education">
+          <button type="button" role="tab" id="tab-work" aria-controls="panel-work" aria-selected="true">Positions</button>
+          <button type="button" role="tab" id="tab-edu" aria-controls="panel-edu" aria-selected="false" tabindex="-1">Education</button>
+        </div>
+        <ol class="entries tab-panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work"></ol>
+        <ol class="entries tab-panel" id="panel-edu" role="tabpanel" aria-labelledby="tab-edu" hidden></ol>
+      </div>
+    </section>
+
+    <section class="sec" id="teaching" aria-labelledby="h-teach">
+      <h2 class="sec-title" id="h-teach">Teaching</h2>
+      <div class="sec-body">
+        <ol class="entries" id="teaching-list"></ol>
+      </div>
+    </section>
+
+    <section class="sec" id="service" aria-labelledby="h-service">
+      <h2 class="sec-title" id="h-service">Service and honours</h2>
+      <div class="sec-body">
+        <h3 class="sub-title">Honours and fellowships</h3>
+        <ul class="ledger" id="honors-list"></ul>
+        <h3 class="sub-title">Peer review</h3>
+        <ul class="ledger" id="review-list"></ul>
+      </div>
+    </section>
+
+    <section class="sec" id="contact" aria-labelledby="h-contact">
+      <h2 class="sec-title" id="h-contact">Contact</h2>
+      <div class="sec-body">
+        <p class="contact-lead">For collaborations, freelance projects in scientific machine learning, or questions about my work, write to me directly.</p>
+        <div class="contact-row">
+          <a class="email-link" id="contact-email" href="#"></a>
+          <button type="button" class="btn" id="copy-email">Copy address</button>
+          <a class="btn btn-quiet" id="contact-cv" href="#" target="_blank" rel="noopener">Download CV</a>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- BibTeX Modal / Overlay -->
-  <div id="bibtex-modal" class="modal-backdrop" aria-hidden="true" role="dialog">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h3 class="modal-title"><i class="fa-solid fa-quote-left"></i> BibTeX Citation</h3>
-        <button class="modal-close" id="modal-close-btn" aria-label="Close modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <pre><code id="bibtex-content" class="language-bibtex"></code></pre>
-      </div>
-      <div class="modal-footer">
-        <span id="copy-status" class="copy-status"></span>
-        <button id="copy-bibtex-btn" class="btn btn-primary">
-          <i class="fa-solid fa-copy"></i> Copy to Clipboard
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================================
-       TREE JUMP MINIGAME MODAL
-       Dedicated pop-up minigame window keeping the main site clean
-       =================================================================== -->
-  <div id="tree-jump-modal" class="modal-backdrop treejump-modal" aria-hidden="true" role="dialog" aria-labelledby="treejump-title">
-    <div class="modal-container treejump-modal-container">
-      <div class="modal-header treejump-modal-header">
-        <div class="treejump-header-title">
-          <i class="fa-solid fa-tree text-forest"></i>
-          <h3 id="treejump-title" class="modal-title">Tree Jump</h3>
-          <span class="treejump-tag">Forest Minigame</span>
-        </div>
-        <div class="treejump-header-controls">
-          <div id="treejump-hud" class="treejump-hud" style="display: none;">
-            <div class="treejump-hud-stat">
-              <span class="treejump-hud-label">SCORE</span>
-              <span id="treejump-score-val" class="treejump-hud-val">0000</span>
-            </div>
-            <div class="treejump-hud-stat">
-              <span class="treejump-hud-label">HI</span>
-              <span id="treejump-high-score-val" class="treejump-hud-val">0000</span>
-            </div>
-          </div>
-          <button class="modal-close" id="treejump-close-btn" aria-label="Close Tree Jump game">&times;</button>
-        </div>
-      </div>
-
-      <div class="modal-body treejump-modal-body">
-        <div class="treejump-canvas-wrapper">
-          <canvas id="tree-jump-canvas"></canvas>
-
-          <!-- Start Overlay Dialog -->
-          <div id="treejump-start-dialog" class="treejump-overlay-panel">
-            <div class="treejump-panel-card">
-              <div class="treejump-badge"><i class="fa-solid fa-tree"></i> ARCADE</div>
-              <h2 class="treejump-card-title">Tree Jump</h2>
-              <p class="treejump-card-desc">
-                Roll down the hills and leap over forest trees of different sizes!
-              </p>
-              <div class="treejump-instructions">
-                <span class="instruction-key"><i class="fa-solid fa-arrow-pointer"></i> Tap / Click</span>
-                <span class="instruction-divider">or</span>
-                <span class="instruction-key"><i class="fa-regular fa-keyboard"></i> Spacebar / &uarr;</span>
-              </div>
-              <button id="btn-treejump-start" class="btn btn-primary treejump-action-btn">
-                <i class="fa-solid fa-play"></i> Start Rolling
-              </button>
-            </div>
-          </div>
-
-          <!-- Game Over Overlay Dialog -->
-          <div id="treejump-gameover-dialog" class="treejump-overlay-panel" style="display: none;">
-            <div class="treejump-panel-card">
-              <div class="treejump-badge badge-gameover">GAME OVER</div>
-              <h2 class="treejump-card-title">You Hit a Tree!</h2>
-              <div class="treejump-results-grid">
-                <div class="treejump-result-box">
-                  <span class="treejump-result-label">FINAL SCORE</span>
-                  <span id="treejump-final-score" class="treejump-result-val">0</span>
-                </div>
-                <div class="treejump-result-box">
-                  <span class="treejump-result-label">BEST RECORD</span>
-                  <span id="treejump-best-score" class="treejump-result-val">0</span>
-                </div>
-              </div>
-              <button id="btn-treejump-restart" class="btn btn-primary treejump-action-btn">
-                <i class="fa-solid fa-rotate-right"></i> Play Again
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="treejump-footer-hint">
-          <span><i class="fa-solid fa-circle-info"></i> Click or tap anywhere inside the canvas or press <strong>Spacebar</strong> to jump.</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="page-container footer-content">
-      <div class="footer-left">
-        <p>&copy; <span id="footer-year">2026</span> <strong id="footer-author">Dr. Alex Vance</strong>. Hosted with <i class="fa-solid fa-heart footer-heart"></i> on <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>.</p>
-        <p class="footer-subtext">Modern Interactive Tiles Architecture · Low-glare Forest Green &amp; Botanical Linen · Zero external tracking.</p>
-      </div>
-      <div class="footer-right">
-        <a href="#about" class="back-to-top" title="Back to top">
-          Back to Top <i class="fa-solid fa-arrow-up"></i>
-        </a>
-      </div>
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>&copy; <span id="footer-year">2026</span> <span id="footer-name">Shailendra Dabral</span>. Hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>.</p>
+      <a href="#top" class="text-btn">Back to top</a>
     </div>
   </footer>
 
-  <!-- Scripts -->
+  <dialog class="cite-dialog" id="cite-dialog" aria-labelledby="cite-title">
+    <div class="cite-head">
+      <h3 id="cite-title">Cite this paper</h3>
+      <button type="button" class="icon-btn" id="cite-close" aria-label="Close">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </div>
+    <pre class="cite-code"><code id="cite-code"></code></pre>
+    <div class="cite-foot">
+      <span class="cite-status" id="cite-status" aria-live="polite"></span>
+      <button type="button" class="btn" id="cite-copy">Copy BibTeX</button>
+    </div>
+  </dialog>
+
   <script src="assets/js/content.js"></script>
   <script src="assets/js/main.js"></script>
-  <script src="assets/js/treejump.js"></script>
 </body>
 </html>

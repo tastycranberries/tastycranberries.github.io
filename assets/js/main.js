@@ -1,843 +1,695 @@
-/**
- * ===================================================================
- * ACADEMIC WEBSITE INTERACTIVE LOGIC & RENDER ENGINE
- * ===================================================================
- */
+/* =====================================================================
+   Site behaviour. All personal content lives in content.js.
+   ===================================================================== */
+(function () {
+  "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
-  initTheme();
-  renderProfile();
-  renderResearchFocus();
-  renderNews();
-  renderPublications();
-  renderExperienceEducation();
-  renderTeaching();
-  renderService();
-  initBibtexModal();
-  initMobileNav();
-  initTilesHub();
-  renderLatexMath();
-});
+  const P = window.ACADEMIC_PROFILE || ACADEMIC_PROFILE;
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------------- Theme & Color Palettes System (10 Themes) ---------------- */
-const THEMES = [
-  { id: "light", name: "Forest Sage", shortName: "Sage", color: "#1b4931", mode: "light" },
-  { id: "dark", name: "Evergreen Night", shortName: "Dark", color: "#52b788", mode: "dark" },
-  { id: "ocean", name: "Oxford Ocean", shortName: "Ocean", color: "#1d4ed8", mode: "light" },
-  { id: "midnight", name: "Midnight Sapphire", shortName: "Midnight", color: "#38bdf8", mode: "dark" },
-  { id: "terracotta", name: "Warm Terracotta", shortName: "Terracotta", color: "#c2410c", mode: "light" },
-  { id: "amethyst", name: "Royal Amethyst", shortName: "Amethyst", color: "#c084fc", mode: "dark" },
-  { id: "teal", name: "Emerald Lagoon", shortName: "Teal", color: "#0f766e", mode: "light" },
-  { id: "slate", name: "Nordic Slate", shortName: "Slate", color: "#334155", mode: "light" },
-  { id: "rose", name: "Berry Rose", shortName: "Rose", color: "#be185d", mode: "light" },
-  { id: "amber", name: "Solar Amber", shortName: "Amber", color: "#b45309", mode: "light" }
-];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const isRealUrl = (u) => !!u && u !== "#";
 
-let activeThemeToastTimeout = null;
+  document.addEventListener("DOMContentLoaded", () => {
+    initMode();
+    renderProfile();
+    renderResearch();
+    initPublications();
+    renderNews();
+    initExperience();
+    renderTeaching();
+    renderService();
+    renderContact();
+    initCiteDialog();
+    initTopbar();
+    initScrollSpy();
+    initSkyChart();
+    renderMath(document.body);
+  });
 
-function initTheme() {
-  const themeToggleBtn = document.getElementById("theme-toggle");
-  const paletteBtn = document.getElementById("theme-palette-btn");
-  const switcherGroup = document.getElementById("theme-switcher-group");
-  const swatchesContainer = document.getElementById("palette-swatches-list");
-
-  // Determine initial theme from localStorage or default
-  const storedTheme = localStorage.getItem("academic-site-theme");
-  const initialTheme = storedTheme && THEMES.some(t => t.id === storedTheme) ? storedTheme : "light";
-  setTheme(initialTheme, false);
-
-  // Render swatches into popover
-  if (swatchesContainer) {
-    swatchesContainer.innerHTML = THEMES.map(theme => `
-      <button class="palette-swatch-item ${theme.id === initialTheme ? 'active' : ''}" data-theme-id="${theme.id}" role="menuitem">
-        <div class="swatch-item-left">
-          <span class="swatch-color-pill" style="background-color: ${theme.color};"></span>
-          <span class="swatch-name">${theme.name}</span>
-        </div>
-        <div class="swatch-item-right">
-          <span class="swatch-mode-tag">${theme.mode}</span>
-          <i class="fa-solid fa-check swatch-check"></i>
-        </div>
-      </button>
-    `).join("");
-
-    // Attach click events to swatches
-    swatchesContainer.querySelectorAll(".palette-swatch-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const themeId = item.getAttribute("data-theme-id");
-        setTheme(themeId, true);
-        if (switcherGroup) switcherGroup.classList.remove("open");
-      });
+  /* ---------------- Reading mode (day plate / observatory red light) ---------------- */
+  const modeListeners = [];
+  function initMode() {
+    const btn = $("#mode-toggle");
+    const sync = () => btn.setAttribute("aria-pressed", String(document.documentElement.dataset.mode === "night"));
+    sync();
+    btn.addEventListener("click", () => {
+      const next = document.documentElement.dataset.mode === "night" ? "day" : "night";
+      document.documentElement.dataset.mode = next;
+      try { localStorage.setItem("site-mode", next); } catch (e) { /* storage unavailable */ }
+      sync();
+      modeListeners.forEach((fn) => fn());
     });
   }
 
-  // Quick Cycle Button: Click to cycle to next theme in sequence
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener("click", () => {
-      const currentId = document.documentElement.getAttribute("data-theme") || "light";
-      const currentIndex = THEMES.findIndex(t => t.id === currentId);
-      const nextIndex = (currentIndex + 1) % THEMES.length;
-      setTheme(THEMES[nextIndex].id, true);
+  /* ---------------- Profile ---------------- */
+  function renderProfile() {
+    document.title = P.name;
+    $("#profile-name").textContent = P.name;
+    $("#brand-name").textContent = P.name;
+    $("#brand-initials").textContent = P.initials || P.name.split(" ").map((w) => w[0]).join("").slice(0, 2);
+    $("#footer-name").textContent = P.name;
+    $("#footer-year").textContent = new Date().getFullYear();
+    $("#profile-role").textContent = P.role || "";
+
+    const aff = $("#profile-affiliation");
+    aff.textContent = P.affiliation || "";
+    if (isRealUrl(P.affiliationUrl)) { aff.href = P.affiliationUrl; aff.target = "_blank"; aff.rel = "noopener"; }
+    else aff.removeAttribute("href");
+
+    const status = $("#profile-status");
+    if (P.status) status.textContent = P.status; else status.remove();
+
+    const avatar = $("#profile-avatar");
+    if (P.avatar) { avatar.src = P.avatar; avatar.alt = `Portrait of ${P.name}`; }
+
+    $("#profile-bio").innerHTML = (P.bio || []).map((p) => `<p>${p}</p>`).join("");
+
+    $("#profile-links").innerHTML = (P.links || [])
+      .filter((l) => isRealUrl(l.url))
+      .map((l) => {
+        const external = /^https?:/.test(l.url);
+        return `<li class="${l.isCv ? "is-cv" : ""}"><a href="${esc(l.url)}"${external || l.isCv ? ' target="_blank" rel="noopener"' : ""}>
+          <i class="${esc(l.icon)}" aria-hidden="true"></i>${esc(l.label)}</a></li>`;
+      }).join("");
+  }
+
+  /* ---------------- Research ---------------- */
+  function renderResearch() {
+    $("#research-list").innerHTML = (P.researchFocus || []).map((r) => `
+      <article class="research-item">
+        <h3>${esc(r.title)}</h3>
+        <p>${r.description}</p>
+        ${r.tags && r.tags.length ? `<ul class="tags" aria-label="Keywords">${r.tags.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+      </article>`).join("");
+  }
+
+  /* ---------------- Publications ---------------- */
+  const LINK_LABELS = { pdf: "PDF", arxiv: "arXiv", code: "Code", project: "Project page", slides: "Slides", video: "Video", poster: "Poster" };
+  const pubState = { filter: "all", query: "" };
+
+  function initPublications() {
+    const pubs = (P.publications || []).slice().sort((a, b) => b.year - a.year);
+    const counts = { all: pubs.length, conference: 0, journal: 0, preprint: 0 };
+    pubs.forEach((p) => { if (counts[p.type] !== undefined) counts[p.type]++; });
+    $$("[data-count]").forEach((el) => { el.textContent = counts[el.dataset.count] ?? 0; });
+    $$("#pub-filters button").forEach((b) => { if (b.dataset.filter !== "all" && !counts[b.dataset.filter]) b.hidden = true; });
+
+    $("#pub-filters").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-filter]");
+      if (!btn) return;
+      pubState.filter = btn.dataset.filter;
+      $$("#pub-filters button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      drawPublications(pubs);
     });
-  }
 
-  // Palette Menu Toggle Button
-  if (paletteBtn && switcherGroup) {
-    paletteBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const isOpen = switcherGroup.classList.toggle("open");
-      paletteBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    const input = $("#pub-search");
+    let t;
+    input.addEventListener("input", () => {
+      clearTimeout(t);
+      t = setTimeout(() => { pubState.query = input.value.trim(); drawPublications(pubs); }, 120);
     });
+    input.addEventListener("keydown", (e) => { if (e.key === "Escape") { input.value = ""; pubState.query = ""; drawPublications(pubs); } });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "/" || e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      if (/INPUT|TEXTAREA|SELECT/.test(tag) || $("#cite-dialog").open) return;
+      e.preventDefault();
+      input.focus({ preventScroll: true });
+      $("#publications").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+    });
+
+    $("#pub-list").addEventListener("click", (e) => {
+      const toggle = e.target.closest("[data-abstract]");
+      if (toggle) {
+        const panel = document.getElementById(toggle.getAttribute("aria-controls"));
+        const open = toggle.getAttribute("aria-expanded") !== "true";
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.classList.toggle("is-open", open);
+        panel.inert = !open;
+        return;
+      }
+      const cite = e.target.closest("[data-cite]");
+      if (cite) {
+        const pub = pubs.find((p) => p.id === cite.dataset.cite);
+        if (pub) openCite(pub, cite);
+      }
+    });
+
+    $("#pub-status").addEventListener("click", (e) => {
+      if (!e.target.closest("[data-clear]")) return;
+      input.value = ""; pubState.query = ""; pubState.filter = "all";
+      $$("#pub-filters button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === "all")));
+      drawPublications(pubs);
+      input.focus();
+    });
+
+    drawPublications(pubs);
   }
 
-  // Close palette on click outside
-  document.addEventListener("click", (e) => {
-    if (switcherGroup && !switcherGroup.contains(e.target)) {
-      switcherGroup.classList.remove("open");
-      if (paletteBtn) paletteBtn.setAttribute("aria-expanded", "false");
-    }
-  });
-
-  // Close palette on Escape
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && switcherGroup && switcherGroup.classList.contains("open")) {
-      switcherGroup.classList.remove("open");
-      if (paletteBtn) paletteBtn.setAttribute("aria-expanded", "false");
-    }
-  });
-}
-
-function setTheme(themeId, showToast = false) {
-  const themeObj = THEMES.find(t => t.id === themeId) || THEMES[0];
-
-  document.documentElement.setAttribute("data-theme", themeObj.id);
-  document.documentElement.setAttribute("data-mode", themeObj.mode);
-  localStorage.setItem("academic-site-theme", themeObj.id);
-
-  // Update button UI
-  const dot = document.getElementById("theme-indicator-dot");
-  if (dot) dot.style.backgroundColor = themeObj.color;
-
-  const btnName = document.getElementById("theme-btn-name");
-  if (btnName) btnName.textContent = themeObj.shortName;
-
-  const themeToggleBtn = document.getElementById("theme-toggle");
-  if (themeToggleBtn) {
-    themeToggleBtn.title = `Current: ${themeObj.name} (Click to switch next)`;
-  }
-
-  // Update active state in popover
-  document.querySelectorAll(".palette-swatch-item").forEach(item => {
-    if (item.getAttribute("data-theme-id") === themeObj.id) {
-      item.classList.add("active");
-    } else {
-      item.classList.remove("active");
-    }
-  });
-
-  // Trigger optional toast feedback
-  if (showToast) {
-    showThemeToast(themeObj);
-  }
-}
-
-function showThemeToast(themeObj) {
-  const existing = document.querySelector(".theme-switch-toast");
-  if (existing) existing.remove();
-  if (activeThemeToastTimeout) clearTimeout(activeThemeToastTimeout);
-
-  const toast = document.createElement("div");
-  toast.className = "theme-switch-toast";
-  toast.innerHTML = `
-    <span class="toast-color-dot" style="background-color: ${themeObj.color};"></span>
-    <span>Theme: ${themeObj.name} (${themeObj.mode.toUpperCase()})</span>
-  `;
-  document.body.appendChild(toast);
-
-  activeThemeToastTimeout = setTimeout(() => {
-    toast.remove();
-  }, 1600);
-}
-
-/* ---------------- Profile & Bio Rendering ---------------- */
-function renderProfile() {
-  if (typeof ACADEMIC_PROFILE === "undefined") return;
-
-  const p = ACADEMIC_PROFILE;
-  
-  // Title & Headers
-  document.title = `${p.name} | Academic Researcher`;
-  
-  const brandName = document.getElementById("nav-brand-name");
-  if (brandName) brandName.textContent = p.name;
-
-  const profileName = document.getElementById("profile-name");
-  if (profileName) profileName.textContent = p.name;
-
-  const profileRole = document.getElementById("profile-role");
-  if (profileRole) profileRole.textContent = p.role;
-
-  const profileAffiliation = document.getElementById("profile-affiliation");
-  if (profileAffiliation) {
-    profileAffiliation.innerHTML = p.affiliationUrl 
-      ? `<a href="${p.affiliationUrl}" target="_blank" rel="noopener">${p.affiliation}</a>`
-      : p.affiliation;
-  }
-
-  const profileStatus = document.getElementById("profile-status");
-  if (profileStatus && p.status) profileStatus.textContent = p.status;
-
-  const avatar = document.getElementById("profile-avatar");
-  if (avatar && p.avatar) {
-    avatar.src = p.avatar;
-    avatar.alt = p.name;
-  }
-
-  // Bio paragraphs
-  const bioContainer = document.getElementById("profile-bio");
-  if (bioContainer && Array.isArray(p.bio)) {
-    bioContainer.innerHTML = p.bio.map(paragraph => `<p>${paragraph}</p>`).join("");
-  }
-
-  // Social & Academic Badges
-  const linksContainer = document.getElementById("profile-links");
-  if (linksContainer && Array.isArray(p.links)) {
-    linksContainer.innerHTML = p.links.map(link => {
-      const isCv = link.isCv ? "academic-badge badge-cv" : "academic-badge";
-      const target = link.url.startsWith("mailto:") ? "" : 'target="_blank" rel="noopener"';
-      return `
-        <a href="${link.url}" class="${isCv}" ${target}>
-          <i class="${link.icon}"></i>
-          <span>${link.label}</span>
-        </a>
-      `;
+  function highlight(text, q) {
+    // Escape, then mark matches only outside $…$ math so KaTeX still renders.
+    const parts = String(text).split(/(\$[^$]+\$)/g);
+    const re = q ? new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi") : null;
+    return parts.map((part) => {
+      if (/^\$[^$]+\$$/.test(part)) return esc(part);
+      const safe = esc(part);
+      return re ? safe.replace(new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), (m) => `<mark>${m}</mark>`) : safe;
     }).join("");
   }
 
-  // Footer info
-  const footerYear = document.getElementById("footer-year");
-  if (footerYear) footerYear.textContent = new Date().getFullYear();
-
-  const footerAuthor = document.getElementById("footer-author");
-  if (footerAuthor) footerAuthor.textContent = p.name;
-}
-
-/* ---------------- Research Focus Rendering ---------------- */
-function renderResearchFocus() {
-  const container = document.getElementById("research-grid");
-  if (!container || !ACADEMIC_PROFILE.researchFocus) return;
-
-  container.innerHTML = ACADEMIC_PROFILE.researchFocus.map(item => `
-    <div class="research-card">
-      <div class="research-icon">
-        <i class="${item.icon}"></i>
-      </div>
-      <h3>${item.title}</h3>
-      <p>${item.description}</p>
-      <div class="research-tags">
-        ${item.tags.map(t => `<span class="research-tag">${t}</span>`).join("")}
-      </div>
-    </div>
-  `).join("");
-}
-
-/* ---------------- News Timeline Rendering ---------------- */
-function renderNews() {
-  const container = document.getElementById("news-timeline");
-  if (!container || !ACADEMIC_PROFILE.news) return;
-
-  const newsItems = ACADEMIC_PROFILE.news;
-  
-  const newsCounter = document.getElementById("news-counter");
-  if (newsCounter) newsCounter.textContent = `${newsItems.length} Recent Updates`;
-
-  container.innerHTML = newsItems.map(item => `
-    <div class="news-item">
-      <div class="news-date">${item.date}</div>
-      <div class="news-body">
-        <span class="news-tag tag-${item.tag}">${item.tagLabel || item.tag}</span>
-        <span>${item.content}</span>
-      </div>
-    </div>
-  `).join("");
-}
-
-/* ---------------- Publications Engine ---------------- */
-let currentFilter = "all";
-let currentSearchQuery = "";
-
-function renderPublications() {
-  const container = document.getElementById("publications-list");
-  if (!container || !ACADEMIC_PROFILE.publications) return;
-
-  const pubs = ACADEMIC_PROFILE.publications;
-
-  // Update counts
-  updatePubCounts(pubs);
-
-  // Setup Filter Tabs
-  const filterTabs = document.querySelectorAll(".filter-tab");
-  filterTabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      filterTabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      currentFilter = tab.getAttribute("data-filter");
-      filterAndRenderPublications(pubs, container);
-    });
-  });
-
-  // Setup Search Input
-  const searchInput = document.getElementById("pub-search");
-  if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      currentSearchQuery = e.target.value.toLowerCase().trim();
-      filterAndRenderPublications(pubs, container);
-    });
-  }
-
-  // Initial Render
-  filterAndRenderPublications(pubs, container);
-}
-
-function updatePubCounts(pubs) {
-  const countAll = document.getElementById("count-all");
-  const countConf = document.getElementById("count-conf");
-  const countJournal = document.getElementById("count-journal");
-  const countPreprint = document.getElementById("count-preprint");
-
-  if (countAll) countAll.textContent = pubs.length;
-  if (countConf) countConf.textContent = pubs.filter(p => p.type === "conference").length;
-  if (countJournal) countJournal.textContent = pubs.filter(p => p.type === "journal").length;
-  if (countPreprint) countPreprint.textContent = pubs.filter(p => p.type === "preprint").length;
-}
-
-function filterAndRenderPublications(pubs, container) {
-  const filtered = pubs.filter(pub => {
-    const matchesFilter = currentFilter === "all" || pub.type === currentFilter;
-    const searchText = `${pub.title} ${pub.authors.join(" ")} ${pub.venue} ${pub.abstract || ""}`.toLowerCase();
-    const matchesSearch = !currentSearchQuery || searchText.includes(currentSearchQuery);
-    return matchesFilter && matchesSearch;
-  });
-
-  if (filtered.length === 0) {
-    container.innerHTML = `
-      <div style="text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
-        <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.5;"></i>
-        <p>No publications match your selected filter or search term.</p>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = filtered.map(pub => {
-    // Format authors highlighting self
-    const authorsFormatted = pub.authors.map(author => {
-      const isSelf = author.toLowerCase().includes("vance") || 
-                     author.toLowerCase().includes(ACADEMIC_PROFILE.name.toLowerCase().replace("dr. ", ""));
-      return isSelf ? `<span class="author-me">${author}</span>` : author;
-    }).join(", ");
-
-    // Venue badge style
-    let badgeClass = "badge-conf";
-    let badgeTypeLabel = "Conference";
-    if (pub.type === "journal") {
-      badgeClass = "badge-journal";
-      badgeTypeLabel = "Journal";
-    } else if (pub.type === "preprint") {
-      badgeClass = "badge-preprint";
-      badgeTypeLabel = "Preprint";
-    }
-
-    // Links
-    const links = pub.links || {};
-    let linkButtons = "";
-    if (links.pdf && links.pdf !== "#") {
-      linkButtons += `<a href="${links.pdf}" target="_blank" rel="noopener" class="pub-btn"><i class="fa-solid fa-file-pdf"></i> PDF</a>`;
-    }
-    if (links.arxiv) {
-      linkButtons += `<a href="${links.arxiv}" target="_blank" rel="noopener" class="pub-btn"><i class="fa-solid fa-scroll"></i> arXiv</a>`;
-    }
-    if (links.code) {
-      linkButtons += `<a href="${links.code}" target="_blank" rel="noopener" class="pub-btn"><i class="fa-brands fa-github"></i> Code</a>`;
-    }
-    if (links.project) {
-      linkButtons += `<a href="${links.project}" target="_blank" rel="noopener" class="pub-btn"><i class="fa-solid fa-globe"></i> Project</a>`;
-    }
-    if (links.slides) {
-      linkButtons += `<a href="${links.slides}" target="_blank" rel="noopener" class="pub-btn"><i class="fa-solid fa-chalkboard-user"></i> Slides</a>`;
-    }
-
-    // BibTeX & Abstract buttons
-    const bibtexBtn = pub.bibtex ? `
-      <button class="pub-btn btn-open-bibtex" data-pub-id="${pub.id}">
-        <i class="fa-solid fa-quote-right"></i> BibTeX
-      </button>
-    ` : "";
-
-    const abstractBtn = pub.abstract ? `
-      <button class="pub-btn btn-toggle-abstract" data-pub-id="${pub.id}">
-        <i class="fa-solid fa-align-left"></i> Abstract
-      </button>
-    ` : "";
-
-    const distinctionBadge = pub.badge ? `
-      <span class="award-badge"><i class="fa-solid fa-star"></i> ${pub.badge}</span>
-    ` : "";
-
-    return `
-      <article class="pub-card" id="pub-${pub.id}">
-        <div class="pub-badge-row">
-          <span class="venue-badge ${badgeClass}">${badgeTypeLabel} · ${pub.year}</span>
-          ${distinctionBadge}
-        </div>
-        <h3 class="pub-title">${pub.title}</h3>
-        <div class="pub-authors">${authorsFormatted}</div>
-        <div class="pub-venue-text">${pub.venue}, ${pub.year}</div>
-        <div class="pub-actions">
-          ${linkButtons}
-          ${bibtexBtn}
-          ${abstractBtn}
-        </div>
-        ${pub.abstract ? `
-          <div class="pub-abstract-drawer" id="abstract-${pub.id}">
-            <strong>Abstract:</strong> ${pub.abstract}
-          </div>
-        ` : ""}
-      </article>
-    `;
-  }).join("");
-
-  // Attach dynamic event listeners for abstracts & BibTeX
-  attachPublicationEvents();
-  renderLatexMath();
-}
-
-function attachPublicationEvents() {
-  // Toggle abstract
-  document.querySelectorAll(".btn-toggle-abstract").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const pubId = btn.getAttribute("data-pub-id");
-      const drawer = document.getElementById(`abstract-${pubId}`);
-      if (drawer) {
-        drawer.classList.toggle("open");
-        btn.classList.toggle("active");
-      }
-    });
-  });
-
-  // Open BibTeX Modal
-  document.querySelectorAll(".btn-open-bibtex").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const pubId = btn.getAttribute("data-pub-id");
-      const pub = ACADEMIC_PROFILE.publications.find(p => p.id === pubId);
-      if (pub && pub.bibtex) {
-        openBibtexModal(pub.bibtex);
-      }
-    });
-  });
-}
-
-/* ---------------- BibTeX Modal Logic ---------------- */
-function initBibtexModal() {
-  const modal = document.getElementById("bibtex-modal");
-  const closeBtn = document.getElementById("modal-close-btn");
-  const copyBtn = document.getElementById("copy-bibtex-btn");
-  const copyStatus = document.getElementById("copy-status");
-
-  if (!modal) return;
-
-  // Close handlers
-  if (closeBtn) closeBtn.addEventListener("click", closeBibtexModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeBibtexModal();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) {
-      closeBibtexModal();
-    }
-  });
-
-  // Copy to clipboard
-  if (copyBtn) {
-    copyBtn.addEventListener("click", () => {
-      const content = document.getElementById("bibtex-content").textContent;
-      navigator.clipboard.writeText(content).then(() => {
-        if (copyStatus) {
-          copyStatus.textContent = "Copied to clipboard!";
-          setTimeout(() => { copyStatus.textContent = ""; }, 3000);
-        }
-      }).catch(() => {
-        // Fallback
-        const textarea = document.createElement("textarea");
-        textarea.value = content;
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-        if (copyStatus) {
-          copyStatus.textContent = "Copied!";
-          setTimeout(() => { copyStatus.textContent = ""; }, 3000);
-        }
-      });
-    });
-  }
-}
-
-function openBibtexModal(bibtexString) {
-  const modal = document.getElementById("bibtex-modal");
-  const content = document.getElementById("bibtex-content");
-  const copyStatus = document.getElementById("copy-status");
-
-  if (content) content.textContent = bibtexString;
-  if (copyStatus) copyStatus.textContent = "";
-  if (modal) {
-    modal.classList.add("open");
-    modal.setAttribute("aria-hidden", "false");
-  }
-}
-
-function closeBibtexModal() {
-  const modal = document.getElementById("bibtex-modal");
-  if (modal) {
-    modal.classList.remove("open");
-    modal.setAttribute("aria-hidden", "true");
-  }
-}
-
-/* ---------------- Experience & Education ---------------- */
-function renderExperienceEducation() {
-  const expContainer = document.getElementById("experience-timeline");
-  const eduContainer = document.getElementById("education-timeline");
-
-  if (expContainer && ACADEMIC_PROFILE.experience) {
-    expContainer.innerHTML = ACADEMIC_PROFILE.experience.map(item => `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-period">${item.period}</div>
-        <div class="timeline-title">${item.role}</div>
-        <div class="timeline-org">${item.org}</div>
-        <div class="timeline-desc">${item.desc}</div>
-      </div>
-    `).join("");
-  }
-
-  if (eduContainer && ACADEMIC_PROFILE.education) {
-    eduContainer.innerHTML = ACADEMIC_PROFILE.education.map(item => `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-period">${item.period}</div>
-        <div class="timeline-title">${item.degree}</div>
-        <div class="timeline-org">${item.org}</div>
-        <div class="timeline-desc">${item.desc}</div>
-      </div>
-    `).join("");
-  }
-}
-
-/* ---------------- Teaching ---------------- */
-function renderTeaching() {
-  const container = document.getElementById("teaching-grid");
-  if (!container || !ACADEMIC_PROFILE.teaching) return;
-
-  container.innerHTML = ACADEMIC_PROFILE.teaching.map(item => `
-    <div class="teaching-card">
-      <div class="teaching-card-header">
-        <span class="teaching-code">${item.code}</span>
-        <span class="teaching-semester">${item.semester}</span>
-      </div>
-      <div class="teaching-title">${item.title}</div>
-      <div class="teaching-role">${item.role}</div>
-      <div class="teaching-desc">${item.desc}</div>
-    </div>
-  `).join("");
-}
-
-/* ---------------- Academic Service & Honors ---------------- */
-function renderService() {
-  const reviewingList = document.getElementById("reviewing-list");
-  const honorsList = document.getElementById("honors-list");
-
-  if (reviewingList && ACADEMIC_PROFILE.service && ACADEMIC_PROFILE.service.reviewing) {
-    reviewingList.innerHTML = ACADEMIC_PROFILE.service.reviewing.map(item => `
-      <li><i class="fa-solid fa-check"></i> <span>${item}</span></li>
-    `).join("");
-  }
-
-  if (honorsList && ACADEMIC_PROFILE.service && ACADEMIC_PROFILE.service.honors) {
-    honorsList.innerHTML = ACADEMIC_PROFILE.service.honors.map(item => `
-      <li><i class="fa-solid fa-trophy"></i> <span>${item}</span></li>
-    `).join("");
-  }
-}
-
-/* ---------------- Mobile Navigation ---------------- */
-function initMobileNav() {
-  const toggleBtn = document.getElementById("mobile-menu-toggle");
-  const nav = document.getElementById("site-nav");
-
-  if (toggleBtn && nav) {
-    toggleBtn.addEventListener("click", () => {
-      nav.classList.toggle("open");
+  function drawPublications(pubs) {
+    const q = pubState.query.toLowerCase();
+    const list = pubs.filter((p) => {
+      if (pubState.filter !== "all" && p.type !== pubState.filter) return false;
+      if (!q) return true;
+      return [p.title, p.venue, p.badge, p.abstract, p.year, (p.authors || []).join(" ")].join(" ").toLowerCase().includes(q);
     });
 
-    // Close on navigation click
-    nav.querySelectorAll(".nav-link").forEach(link => {
-      link.addEventListener("click", () => {
-        nav.classList.remove("open");
-      });
-    });
-  }
-}
+    const status = $("#pub-status");
+    const total = pubs.length;
+    if (pubState.query || pubState.filter !== "all") {
+      const noun = total === 1 ? "paper" : "papers";
+      status.innerHTML = `Showing ${list.length} of ${total} ${noun}${pubState.query ? ` matching “${esc(pubState.query)}”` : ""}. <button type="button" class="text-btn" data-clear>Clear filters</button>`;
+    } else {
+      status.textContent = `${total} ${total === 1 ? "paper" : "papers"}, newest first.`;
+    }
 
-/* ---------------- Windows 8 Metro Tiles & Detailed Stage System ---------------- */
-function initTilesHub() {
-  const tiles = document.querySelectorAll(".metro-tile");
-  const backBtn = document.getElementById("btn-back-to-tiles");
-  const stagePills = document.querySelectorAll(".stage-pill");
-  const navLinks = document.querySelectorAll(".site-nav .nav-link, #brand-home-link");
-
-  // Populate dynamic tile teaser counts
-  updateTileTeasers();
-
-  // Handle Tile Clicks
-  tiles.forEach(tile => {
-    const section = tile.getAttribute("data-section");
-
-    if (section === "games") {
-      tile.addEventListener("click", () => {
-        if (typeof window.openTreeJumpModal === "function") {
-          window.openTreeJumpModal();
-        }
-      });
-
-      tile.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          if (typeof window.openTreeJumpModal === "function") {
-            window.openTreeJumpModal();
-          }
-        }
-      });
+    const container = $("#pub-list");
+    if (!list.length) {
+      container.innerHTML = `<p class="pub-empty">No papers match these filters. Try a broader term, or clear the filters to see everything.</p>`;
       return;
     }
 
-    tile.addEventListener("click", () => {
-      openDetailSection(section, true);
+    const byYear = new Map();
+    list.forEach((p) => { if (!byYear.has(p.year)) byYear.set(p.year, []); byYear.get(p.year).push(p); });
+
+    container.innerHTML = Array.from(byYear.entries()).map(([year, items]) => `
+      <section class="pub-year" aria-label="${year}">
+        <div class="pub-year-label">${year}</div>
+        <div class="pub-year-items">${items.map((p) => pubHTML(p, pubState.query)).join("")}</div>
+      </section>`).join("");
+
+    renderMath(container);
+  }
+
+  function pubHTML(p, q) {
+    const links = p.links || {};
+    const primary = [links.project, links.arxiv, links.pdf].find(isRealUrl);
+    const title = highlight(p.title, q);
+    const authors = (p.authors || []).map((a) => {
+      const h = highlight(a, q);
+      return a === P.name ? `<span class="me">${h}</span>` : h;
+    }).join(", ");
+    const linkItems = Object.entries(links).filter(([, u]) => isRealUrl(u))
+      .map(([k, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(LINK_LABELS[k] || k)}</a>`).join("");
+    const absId = `abs-${p.id}`;
+
+    return `<article class="pub">
+      <h3 class="pub-title">${primary ? `<a href="${esc(primary)}" target="_blank" rel="noopener">${title}</a>` : title}</h3>
+      <p class="pub-authors">${authors}</p>
+      <p class="pub-venue">${highlight(p.venue, q)}${p.badge ? `<span class="pub-badge">${esc(p.badge)}</span>` : ""}</p>
+      <div class="pub-actions">
+        ${p.abstract ? `<button type="button" data-abstract aria-expanded="false" aria-controls="${absId}">Abstract <i class="fa-solid fa-chevron-down chev" aria-hidden="true"></i></button>` : ""}
+        ${linkItems}
+        ${p.bibtex ? `<button type="button" data-cite="${esc(p.id)}">Cite</button>` : ""}
+      </div>
+      ${p.abstract ? `<div class="pub-abstract" id="${absId}" inert><div><p>${p.abstract}</p></div></div>` : ""}
+    </article>`;
+  }
+
+  /* ---------------- Citation dialog ---------------- */
+  let citeReturnFocus = null;
+  function initCiteDialog() {
+    const dlg = $("#cite-dialog");
+    $("#cite-close").addEventListener("click", () => dlg.close());
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+    dlg.addEventListener("close", () => { if (citeReturnFocus) citeReturnFocus.focus(); });
+    $("#cite-copy").addEventListener("click", async () => {
+      const ok = await copyText($("#cite-code").textContent);
+      $("#cite-status").textContent = ok ? "Copied BibTeX" : "Copy failed. Select the text and copy it manually.";
     });
+  }
+  function openCite(pub, trigger) {
+    citeReturnFocus = trigger;
+    $("#cite-code").textContent = pub.bibtex;
+    $("#cite-status").textContent = "";
+    $("#cite-dialog").showModal();
+  }
 
-    tile.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        openDetailSection(section, true);
-      }
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      let ok = false; try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+      ta.remove(); return ok;
+    }
+  }
+
+  /* ---------------- News ---------------- */
+  function renderNews() {
+    const VISIBLE = 3;
+    const items = P.news || [];
+    const list = $("#news-list");
+    list.innerHTML = items.map((n, i) => `
+      <li class="entry news-item${i >= VISIBLE ? " is-extra" : ""}">
+        <div class="entry-when"><span>${esc(n.date)}</span>${n.tagLabel ? `<span class="entry-kind">${esc(n.tagLabel)}</span>` : ""}</div>
+        <p class="entry-text">${n.content}</p>
+      </li>`).join("");
+
+    const more = $("#news-more");
+    if (items.length <= VISIBLE) return;
+    more.hidden = false;
+    const label = () => { more.textContent = list.classList.contains("is-expanded") ? "Show fewer updates" : `Show all ${items.length} updates`; };
+    label();
+    more.setAttribute("aria-controls", "news-list");
+    more.addEventListener("click", () => {
+      const expanded = list.classList.toggle("is-expanded");
+      more.setAttribute("aria-expanded", String(expanded));
+      label();
     });
-  });
-
-  // Handle Back to Tiles Button
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      closeDetailStage(true);
-    });
   }
 
-  // Handle Stage Nav Pills (Quick Switcher)
-  stagePills.forEach(pill => {
-    pill.addEventListener("click", () => {
-      const target = pill.getAttribute("data-target");
-      openDetailSection(target, false);
-    });
-  });
+  /* ---------------- Experience / Education tabs ---------------- */
+  function initExperience() {
+    $("#panel-work").innerHTML = (P.experience || []).map((x) => entryHTML(x.period, x.role, x.org, x.desc)).join("");
+    $("#panel-edu").innerHTML = (P.education || []).map((x) => entryHTML(x.period, x.degree, x.org, x.desc)).join("");
 
-  // Handle Header Nav Links
-  navLinks.forEach(link => {
-    link.addEventListener("click", (e) => {
-      const target = link.getAttribute("data-target");
-      if (target === "about" || !target) {
-        closeDetailStage(true);
-      } else {
-        e.preventDefault();
-        openDetailSection(target, true);
-      }
-    });
-  });
-
-  // Check URL Hash on initial page load
-  checkUrlHashOnLoad();
-
-  // Listen to browser Back/Forward navigation
-  window.addEventListener("popstate", () => {
-    checkUrlHashOnLoad();
-  });
-}
-
-function updateTileTeasers() {
-  if (typeof ACADEMIC_PROFILE === "undefined") return;
-
-  const pubs = ACADEMIC_PROFILE.publications || [];
-  const news = ACADEMIC_PROFILE.news || [];
-  const exp = ACADEMIC_PROFILE.experience || [];
-  const edu = ACADEMIC_PROFILE.education || [];
-  const teaching = ACADEMIC_PROFILE.teaching || [];
-  const service = ACADEMIC_PROFILE.service || {};
-
-  // Publications
-  const tileCountPubs = document.getElementById("tile-count-pubs");
-  if (tileCountPubs) tileCountPubs.textContent = pubs.length;
-  const panelPubCounter = document.getElementById("panel-pub-counter");
-  if (panelPubCounter) panelPubCounter.textContent = `${pubs.length} Papers`;
-
-  const oralCount = pubs.filter(p => p.badge && (p.badge.toLowerCase().includes("oral") || p.badge.toLowerCase().includes("spotlight"))).length;
-  const tileTeaserPubs = document.getElementById("tile-teaser-publications");
-  if (tileTeaserPubs && pubs.length > 0) {
-    tileTeaserPubs.textContent = `${pubs.length} Papers · ${oralCount} Oral / Spotlight Recognitions`;
-  }
-
-  // News
-  const tileCountNews = document.getElementById("tile-count-news");
-  if (tileCountNews) tileCountNews.textContent = news.length;
-  const panelNewsCounter = document.getElementById("panel-news-counter");
-  if (panelNewsCounter) panelNewsCounter.textContent = `${news.length} Recent Updates`;
-
-  const tileTeaserNews = document.getElementById("tile-teaser-news");
-  if (tileTeaserNews && news.length > 0) {
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = news[0].content;
-    const cleanText = tempDiv.textContent || tempDiv.innerText || "";
-    tileTeaserNews.textContent = `${news[0].date}: ${cleanText.slice(0, 75)}...`;
-  }
-
-  // Experience
-  const tileTeaserExp = document.getElementById("tile-teaser-experience");
-  if (tileTeaserExp && exp.length > 0) {
-    tileTeaserExp.textContent = `${exp[0].role} at ${exp[0].org}`;
-  }
-
-  // Teaching
-  const tileTeaserTeaching = document.getElementById("tile-teaser-teaching");
-  if (tileTeaserTeaching && teaching.length > 0) {
-    const courseCodes = teaching.map(t => t.code).join(", ");
-    tileTeaserTeaching.textContent = `${teaching.length} Courses: ${courseCodes}`;
-  }
-}
-
-function openDetailSection(sectionName, smoothScroll = true) {
-  const stage = document.getElementById("details-stage");
-  if (!stage) return;
-
-  // Open Stage
-  stage.classList.add("is-open");
-
-  // Update active state on tiles
-  document.querySelectorAll(".metro-tile").forEach(t => {
-    if (t.getAttribute("data-section") === sectionName) {
-      t.classList.add("active");
-    } else {
-      t.classList.remove("active");
-    }
-  });
-
-  // Update active detail panel
-  document.querySelectorAll(".detail-panel").forEach(panel => {
-    if (panel.id === `panel-${sectionName}`) {
-      panel.classList.add("active");
-    } else {
-      panel.classList.remove("active");
-    }
-  });
-
-  // Update stage quick-switcher pills
-  document.querySelectorAll(".stage-pill").forEach(pill => {
-    if (pill.getAttribute("data-target") === sectionName) {
-      pill.classList.add("active");
-    } else {
-      pill.classList.remove("active");
-    }
-  });
-
-  // Update Header Nav Links
-  document.querySelectorAll(".site-nav .nav-link").forEach(link => {
-    if (link.getAttribute("data-target") === sectionName) {
-      link.classList.add("active");
-    } else {
-      link.classList.remove("active");
-    }
-  });
-
-  // Update URL Hash without triggering abrupt page jump
-  if (history.pushState) {
-    history.pushState(null, null, `#${sectionName}`);
-  } else {
-    location.hash = `#${sectionName}`;
-  }
-
-  // Smooth scroll to stage if requested
-  if (smoothScroll) {
-    setTimeout(() => {
-      const stageTop = stage.getBoundingClientRect().top + window.pageYOffset - 90;
-      window.scrollTo({ top: stageTop, behavior: "smooth" });
-    }, 50);
-  }
-
-  // Re-run LaTeX math rendering if formulas are in this panel
-  renderLatexMath();
-}
-
-function closeDetailStage(smoothScroll = true) {
-  const stage = document.getElementById("details-stage");
-  if (!stage) return;
-
-  stage.classList.remove("is-open");
-
-  // Deactivate all tiles & panels
-  document.querySelectorAll(".metro-tile").forEach(t => t.classList.remove("active"));
-  document.querySelectorAll(".detail-panel").forEach(p => p.classList.remove("active"));
-  document.querySelectorAll(".stage-pill").forEach(p => p.classList.remove("active"));
-
-  // Highlight 'Overview' nav link
-  document.querySelectorAll(".site-nav .nav-link").forEach(link => {
-    if (link.getAttribute("data-target") === "about") {
-      link.classList.add("active");
-    } else {
-      link.classList.remove("active");
-    }
-  });
-
-  if (history.pushState) {
-    history.pushState(null, null, "#about");
-  }
-
-  if (smoothScroll) {
-    const hub = document.getElementById("hub-section");
-    if (hub) {
-      const hubTop = hub.getBoundingClientRect().top + window.pageYOffset - 80;
-      window.scrollTo({ top: hubTop, behavior: "smooth" });
-    }
-  }
-}
-
-function checkUrlHashOnLoad() {
-  const hash = window.location.hash.replace("#", "").trim();
-  const validSections = ["publications", "news", "experience", "research", "teaching", "service"];
-  if (validSections.includes(hash)) {
-    openDetailSection(hash, true);
-  }
-}
-
-/* ---------------- KaTeX LaTeX Math Auto-Rendering ---------------- */
-function renderLatexMath() {
-  if (typeof renderMathInElement === "function") {
-    try {
-      renderMathInElement(document.body, {
-        delimiters: [
-          { left: "$$", right: "$$", display: true },
-          { left: "$", right: "$", display: false },
-          { left: "\\(", right: "\\)", display: false },
-          { left: "\\[", right: "\\]", display: true }
-        ],
-        throwOnError: false
+    const tabs = $$('[role="tab"]', $("#experience"));
+    const select = (tab) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
       });
-    } catch (e) {
-      console.warn("KaTeX rendering warning:", e);
-    }
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener("click", () => select(t));
+      t.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        const next = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+        select(next); next.focus();
+      });
+    });
   }
-}
+
+  function entryHTML(when, title, org, desc, kind) {
+    return `<li class="entry">
+      <div class="entry-when"><span>${esc(String(when ?? "").replace(/\s—\s/g, "–"))}</span>${kind ? `<span class="entry-kind">${esc(kind)}</span>` : ""}</div>
+      <div>
+        <h3>${esc(title)}</h3>
+        ${org ? `<p class="entry-org">${esc(org)}</p>` : ""}
+        ${desc ? `<p class="entry-desc">${desc}</p>` : ""}
+      </div>
+    </li>`;
+  }
+
+  /* ---------------- Teaching ---------------- */
+  function renderTeaching() {
+    $("#teaching-list").innerHTML = (P.teaching || [])
+      .map((c) => entryHTML(c.semester, `${c.code ? c.code + ", " : ""}${c.title}`, c.role, c.desc)).join("");
+  }
+
+  /* ---------------- Service & honours ---------------- */
+  function renderService() {
+    const ledger = (arr) => (arr || []).map((s) => {
+      const i = s.indexOf(" — ");
+      const what = i > -1 ? s.slice(0, i) : s;
+      const when = i > -1 ? s.slice(i + 3).replace(/ — /g, "–") : "";
+      return `<li><span>${esc(what)}</span>${when ? `<span class="ledger-when">${esc(when)}</span>` : ""}</li>`;
+    }).join("");
+    const svc = P.service || {};
+    $("#honors-list").innerHTML = ledger(svc.honors);
+    $("#review-list").innerHTML = ledger(svc.reviewing);
+  }
+
+  /* ---------------- Contact ---------------- */
+  function renderContact() {
+    const email = (P.links || []).find((l) => /^mailto:/.test(l.url || ""));
+    const cv = (P.links || []).find((l) => l.isCv && isRealUrl(l.url));
+    const a = $("#contact-email");
+    const copy = $("#copy-email");
+    if (email) {
+      const addr = email.url.replace(/^mailto:/, "");
+      a.href = email.url; a.textContent = addr;
+      copy.addEventListener("click", async () => {
+        const ok = await copyText(addr);
+        copy.textContent = ok ? "Copied" : "Copy failed";
+        setTimeout(() => { copy.textContent = "Copy address"; }, 1800);
+      });
+    } else { a.remove(); copy.remove(); }
+    if (cv) $("#contact-cv").href = cv.url; else $("#contact-cv").remove();
+  }
+
+  /* ---------------- Top bar & scroll spy ---------------- */
+  function initTopbar() {
+    const bar = $("#topbar");
+    const hero = $("#top");
+    new IntersectionObserver(([e]) => bar.classList.toggle("is-scrolled", !e.isIntersecting), {
+      rootMargin: `-${bar.offsetHeight + 1}px 0px 0px 0px`, threshold: 0
+    }).observe(hero);
+  }
+
+  function initScrollSpy() {
+    const links = $$(".site-nav a");
+    const nav = $(".site-nav");
+    const byId = new Map(links.map((l) => [l.getAttribute("href").slice(1), l]));
+    const setActive = (id) => {
+      links.forEach((l) => l.removeAttribute("aria-current"));
+      const link = byId.get(id);
+      if (!link) return;
+      link.setAttribute("aria-current", "true");
+      if (nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: link.offsetLeft - nav.clientWidth / 2 + link.offsetWidth / 2, behavior: reduceMotion ? "auto" : "smooth" });
+      }
+    };
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); });
+    }, { rootMargin: "-40% 0px -55% 0px" });
+    $$("main .sec").forEach((s) => obs.observe(s));
+    new IntersectionObserver(([e]) => { if (e.isIntersecting) setActive(null); }, { threshold: 0.6 }).observe($("#top"));
+  }
+
+  /* ---------------- KaTeX ---------------- */
+  function renderMath(root) {
+    if (typeof window.renderMathInElement !== "function") return;
+    window.renderMathInElement(root, {
+      delimiters: [{ left: "$$", right: "$$", display: true }, { left: "$", right: "$", display: false }],
+      throwOnError: false
+    });
+  }
+
+  /* =====================================================================
+     Star atlas hero
+     Real positions (J2000, approximate) for the bright stars around Orion.
+     Projection: sinusoidal, RA increasing to the left as on a sky chart.
+     ===================================================================== */
+  const STARS = [
+    // name, designation, RA (deg), Dec (deg), visual magnitude
+    ["Betelgeuse", "α Orionis", 88.79, 7.41, 0.50],
+    ["Rigel", "β Orionis", 78.63, -8.20, 0.13],
+    ["Bellatrix", "γ Orionis", 81.28, 6.35, 1.64],
+    ["Mintaka", "δ Orionis", 83.00, -0.30, 2.23],
+    ["Alnilam", "ε Orionis", 84.05, -1.20, 1.69],
+    ["Alnitak", "ζ Orionis", 85.19, -1.94, 1.77],
+    ["Saiph", "κ Orionis", 86.94, -9.67, 2.09],
+    ["Meissa", "λ Orionis", 83.78, 9.93, 3.39],
+    ["Hatysa", "ι Orionis", 83.86, -5.91, 2.77],
+    ["Tabit", "π³ Orionis", 72.46, 6.96, 3.19],
+    ["Aldebaran", "α Tauri", 68.98, 16.51, 0.85],
+    ["Elnath", "β Tauri", 81.57, 28.61, 1.65],
+    ["Tianguan", "ζ Tauri", 84.41, 21.14, 3.00],
+    ["Ain", "ε Tauri", 67.15, 19.18, 3.53],
+    ["Prima Hyadum", "γ Tauri", 64.95, 15.63, 3.65],
+    ["Sirius", "α Canis Majoris", 101.29, -16.72, -1.46],
+    ["Mirzam", "β Canis Majoris", 95.68, -17.96, 1.98],
+    ["Procyon", "α Canis Minoris", 114.83, 5.22, 0.34],
+    ["Gomeisa", "β Canis Minoris", 111.79, 8.29, 2.89],
+    ["Arneb", "α Leporis", 83.18, -17.82, 2.58],
+    ["Nihal", "β Leporis", 82.06, -20.76, 2.84],
+    ["Cursa", "β Eridani", 76.96, -5.09, 2.79],
+    ["Alhena", "γ Geminorum", 99.43, 16.40, 1.93],
+    ["Tejat", "μ Geminorum", 95.74, 22.51, 2.87],
+    ["Mebsuta", "ε Geminorum", 100.98, 25.13, 2.98],
+    ["Alpha Monocerotis", "α Monocerotis", 115.31, -9.55, 3.93]
+  ];
+  const NEBULA = { name: "Orion Nebula", desig: "Messier 42", ra: 83.82, dec: -5.39 };
+  const LINES = [
+    ["Betelgeuse", "Meissa"], ["Meissa", "Bellatrix"], ["Betelgeuse", "Alnitak"], ["Bellatrix", "Mintaka"],
+    ["Mintaka", "Alnilam"], ["Alnilam", "Alnitak"], ["Alnitak", "Saiph"], ["Mintaka", "Rigel"],
+    ["Bellatrix", "Tabit"], ["Sirius", "Mirzam"], ["Procyon", "Gomeisa"], ["Arneb", "Nihal"],
+    ["Aldebaran", "Prima Hyadum"], ["Aldebaran", "Tianguan"], ["Ain", "Elnath"], ["Prima Hyadum", "Ain"],
+    ["Alhena", "Tejat"], ["Tejat", "Mebsuta"]
+  ];
+
+  function initSkyChart() {
+    const canvas = $("#sky");
+    if (!canvas || !canvas.getContext) return;
+    const ctx = canvas.getContext("2d");
+    const hero = $("#top");
+    const roRA = $("#ro-ra"), roDec = $("#ro-dec"), roTarget = $("#ro-target");
+    const defaultTarget = roTarget.textContent;
+    const DEG = Math.PI / 180;
+
+    // Stable faint field stars from a seeded generator
+    let seed = 20260601;
+    const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+    const field = [];
+    for (let i = 0; i < 1400; i++) {
+      const ra = 10 + rand() * 170;
+      const dec = Math.asin(rand() * 1.5 - 0.75) / DEG;   // uniform on the sphere band
+      const mag = 3.8 + Math.pow(rand(), 0.55) * 3.0;
+      field.push([ra, dec, mag]);
+    }
+    const named = STARS.map(([name, desig, ra, dec, mag]) => ({ name, desig, ra, dec, mag }));
+    const byName = new Map(named.map((s) => [s.name, s]));
+
+    let W = 0, H = 0, dpr = 1, scale = 1, cx = 0, cy = 0;
+    const RA0 = 84, DEC0 = -1;
+    let colors = {};
+    let staticLayer = document.createElement("canvas");
+    let drawProgress = reduceMotion ? 1 : 0;
+    const pointer = { x: 0, y: 0, tx: 0, ty: 0, on: false, snap: null };
+
+    const project = (ra, dec) => [cx - (ra - RA0) * Math.cos(dec * DEG) * scale, cy - (dec - DEC0) * scale];
+    const unproject = (x, y) => {
+      const dec = DEC0 - (y - cy) / scale;
+      const ra = RA0 - (x - cx) / (scale * Math.cos(dec * DEG));
+      return [((ra % 360) + 360) % 360, dec];
+    };
+    const radius = (mag) => Math.max(0.55, 4.7 - 1.02 * mag) * Math.min(1.25, Math.max(0.85, scale / 14));
+
+    function readColors() {
+      const cs = getComputedStyle(document.documentElement);
+      const v = (n) => cs.getPropertyValue(n).trim();
+      colors = { star: v("--chart-star"), line: v("--chart-line"), grid: v("--chart-grid"), bg: v("--chart-bg") };
+    }
+
+    function resize() {
+      const rect = hero.getBoundingClientRect();
+      W = rect.width; H = rect.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      staticLayer.width = canvas.width; staticLayer.height = canvas.height;
+      const narrow = W < 700;
+      scale = Math.max(H / (narrow ? 40 : 46), W / 120);
+      cx = W * (narrow ? 0.55 : 0.64);
+      cy = H * (narrow ? 0.34 : 0.4);
+      paintStatic();
+      frame();
+    }
+
+    function paintStatic() {
+      const g = staticLayer.getContext("2d");
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.clearRect(0, 0, W, H);
+      g.font = `500 11px ${getComputedStyle(document.body).getPropertyValue("--sans") || "sans-serif"}`;
+
+      // Coordinate grid: meridians every hour of RA, parallels every 10°
+      g.lineWidth = 1;
+      g.strokeStyle = `rgba(${colors.grid}, .09)`;
+      g.fillStyle = `rgba(${colors.grid}, .42)`;
+      for (let ra = 0; ra <= 360; ra += 15) {
+        g.beginPath();
+        let started = false;
+        for (let dec = -60; dec <= 60; dec += 2) {
+          const [x, y] = project(ra, dec);
+          if (!started) { g.moveTo(x, y); started = true; } else g.lineTo(x, y);
+        }
+        g.stroke();
+        const top = unproject(0, 26)[1];
+        const [lx] = project(ra, top);
+        if (lx > 30 && lx < W - 30) { g.textAlign = "center"; g.fillText(`${ra / 15}h`, lx, 22); }
+      }
+      for (let dec = -50; dec <= 50; dec += 10) {
+        g.beginPath();
+        for (let ra = 0; ra <= 200; ra += 2) {
+          const [x, y] = project(ra, dec);
+          ra === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+        }
+        g.stroke();
+        const [, ly] = project(RA0, dec);
+        if (ly > 40 && ly < H * 0.55) { g.textAlign = "right"; g.fillText(`${dec > 0 ? "+" : dec < 0 ? "−" : ""}${Math.abs(dec)}°`, W - 14, ly - 4); }
+      }
+      // Celestial equator a touch stronger
+      g.strokeStyle = `rgba(${colors.grid}, .2)`;
+      g.setLineDash([2, 4]);
+      g.beginPath();
+      for (let ra = 0; ra <= 200; ra += 2) { const [x, y] = project(ra, 0); ra === 0 ? g.moveTo(x, y) : g.lineTo(x, y); }
+      g.stroke();
+      g.setLineDash([]);
+
+      // Field stars
+      field.forEach(([ra, dec, mag]) => {
+        const [x, y] = project(ra, dec);
+        if (x < -5 || x > W + 5 || y < -5 || y > H + 5) return;
+        g.fillStyle = `rgba(${colors.star}, ${Math.max(0.25, 1 - (mag - 3.8) / 3.6).toFixed(2)})`;
+        g.beginPath(); g.arc(x, y, radius(mag), 0, Math.PI * 2); g.fill();
+      });
+
+      // Orion Nebula as a soft patch
+      const [nx, ny] = project(NEBULA.ra, NEBULA.dec);
+      const neb = g.createRadialGradient(nx, ny, 0, nx, ny, scale * 1.4);
+      neb.addColorStop(0, `rgba(${colors.line}, .32)`);
+      neb.addColorStop(1, `rgba(${colors.line}, 0)`);
+      g.fillStyle = neb;
+      g.beginPath(); g.ellipse(nx, ny, scale * 1.4, scale * 1.1, -0.4, 0, Math.PI * 2); g.fill();
+
+      // Named stars with a paper-coloured halo so lines stop short of them
+      named.forEach((s) => {
+        const [x, y] = project(s.ra, s.dec);
+        s.x = x; s.y = y; s.r = radius(s.mag);
+      });
+    }
+
+    function paintLinesAndStars(g, progress) {
+      g.lineWidth = 1.1;
+      g.strokeStyle = `rgba(${colors.line}, .5)`;
+      LINES.forEach(([a, b], i) => {
+        const A = byName.get(a), B = byName.get(b);
+        const local = Math.min(1, Math.max(0, progress * LINES.length * 0.6 - i * 0.6 + 0.6));
+        if (local <= 0) return;
+        const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy);
+        const ux = dx / len, uy = dy / len;
+        const gapA = A.r + 5, gapB = B.r + 5;
+        if (len <= gapA + gapB) return;
+        const sx = A.x + ux * gapA, sy = A.y + uy * gapA;
+        const ex = A.x + ux * (gapA + (len - gapA - gapB) * local), ey = A.y + uy * (gapA + (len - gapA - gapB) * local);
+        g.beginPath(); g.moveTo(sx, sy); g.lineTo(ex, ey); g.stroke();
+      });
+      named.forEach((s) => {
+        g.fillStyle = `rgba(${colors.star}, 1)`;
+        g.beginPath(); g.arc(s.x, s.y, s.r, 0, Math.PI * 2); g.fill();
+      });
+    }
+
+    function paintFade(g) {
+      // Quiet the chart under the name so the type stays crisp
+      const fade = g.createLinearGradient(0, H * 0.45, 0, H);
+      fade.addColorStop(0, `rgba(${colors.bg}, 0)`);
+      fade.addColorStop(1, `rgba(${colors.bg}, .82)`);
+      g.fillStyle = fade;
+      g.fillRect(0, 0, W, H);
+    }
+
+    function paintReticle(g) {
+      if (!pointer.on) return;
+      const { x, y } = pointer;
+      const r = pointer.snap ? Math.max(14, pointer.snap.r + 10) : 18;
+      g.strokeStyle = `rgba(${colors.line}, .95)`;
+      g.lineWidth = 1.25;
+      for (let q = 0; q < 4; q++) {
+        const a0 = q * Math.PI / 2 + 0.22, a1 = (q + 1) * Math.PI / 2 - 0.22;
+        g.beginPath(); g.arc(x, y, r, a0, a1); g.stroke();
+      }
+      g.beginPath();
+      g.moveTo(x - r - 10, y); g.lineTo(x - r - 3, y);
+      g.moveTo(x + r + 3, y); g.lineTo(x + r + 10, y);
+      g.moveTo(x, y - r - 10); g.lineTo(x, y - r - 3);
+      g.moveTo(x, y + r + 3); g.lineTo(x, y + r + 10);
+      g.stroke();
+    }
+
+    function frame() {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(staticLayer, 0, 0);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      paintLinesAndStars(ctx, drawProgress);
+      paintFade(ctx);
+      paintReticle(ctx);
+    }
+
+    // One orchestrated moment: constellation figures draw in on load
+    function intro() {
+      if (reduceMotion) return;
+      const start = performance.now(), dur = 1800;
+      const step = (t) => {
+        const k = Math.min(1, (t - start) / dur);
+        drawProgress = 1 - Math.pow(1 - k, 3);
+        frame();
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    // Pointer: reticle eases toward the cursor and snaps to named objects
+    let raf = null;
+    const fmtRA = (ra) => {
+      let s = Math.round(ra / 15 * 3600);
+      const h = Math.floor(s / 3600) % 24; s %= 3600;
+      const m = Math.floor(s / 60); s %= 60;
+      return `${h}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+    };
+    const fmtDec = (dec) => {
+      const sign = dec < 0 ? "−" : "+";
+      let a = Math.round(Math.abs(dec) * 60);
+      return `${sign}${Math.floor(a / 60)}° ${String(a % 60).padStart(2, "0")}′`;
+    };
+
+    function updateReadout() {
+      const [ra, dec] = pointer.snap ? [pointer.snap.ra, pointer.snap.dec] : unproject(pointer.tx, pointer.ty);
+      roRA.textContent = fmtRA(ra);
+      roDec.textContent = fmtDec(dec);
+      if (pointer.snap) {
+        const s = pointer.snap;
+        roTarget.innerHTML = `<strong>${esc(s.name)}</strong>, ${esc(s.desig)}${s.mag !== undefined ? `, magnitude ${s.mag.toFixed(2)}` : ""}`;
+      } else {
+        roTarget.textContent = "Empty sky";
+      }
+    }
+
+    function animatePointer() {
+      const k = reduceMotion ? 1 : 0.28;
+      pointer.x += (pointer.tx - pointer.x) * k;
+      pointer.y += (pointer.ty - pointer.y) * k;
+      frame();
+      if (Math.abs(pointer.tx - pointer.x) > 0.3 || Math.abs(pointer.ty - pointer.y) > 0.3) raf = requestAnimationFrame(animatePointer);
+      else { pointer.x = pointer.tx; pointer.y = pointer.ty; frame(); raf = null; }
+    }
+
+    function onMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      let best = null, bestD = 24;
+      named.forEach((s) => { const d = Math.hypot(s.x - x, s.y - y); if (d < bestD) { bestD = d; best = s; } });
+      const [nx, ny] = project(NEBULA.ra, NEBULA.dec);
+      if (!best && Math.hypot(nx - x, ny - y) < 22) best = { ...NEBULA, x: nx, y: ny, r: 6, mag: undefined };
+      pointer.snap = best;
+      pointer.tx = best ? best.x : x;
+      pointer.ty = best ? best.y : y;
+      if (!pointer.on) { pointer.x = pointer.tx; pointer.y = pointer.ty; pointer.on = true; }
+      updateReadout();
+      if (!raf) raf = requestAnimationFrame(animatePointer);
+    }
+
+    function onLeave() {
+      pointer.on = false; pointer.snap = null;
+      roRA.textContent = fmtRA(RA0); roDec.textContent = fmtDec(DEC0);
+      roTarget.textContent = defaultTarget;
+      frame();
+    }
+
+    canvas.addEventListener("pointermove", onMove);
+    canvas.addEventListener("pointerdown", onMove);
+    canvas.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") onLeave(); });
+
+    readColors();
+    roRA.textContent = fmtRA(RA0); roDec.textContent = fmtDec(DEC0);
+    if (matchMedia("(hover: none)").matches) roTarget.textContent = defaultTarget.replace("Move across", "Tap");
+    resize();
+    intro();
+
+    let rt;
+    new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(resize, 80); }).observe(hero);
+    modeListeners.push(() => { readColors(); paintStatic(); frame(); });
+    // Redraw once web fonts arrive so grid labels use them
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { paintStatic(); frame(); });
+  }
+})();

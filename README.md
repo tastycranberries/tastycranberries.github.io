@@ -20,9 +20,11 @@ A clean, modern, zero-dependency personal website designed specifically for acad
   - Two-column timeline for Experience and Education.
   - Teaching & mentoring section.
   - Program Committee (PC) reviewing & honors record.
+- **Interactive star-atlas header**: a chart of the Orion region drawn from real star positions. Move the pointer (or tap) to read RA/Dec and identify bright stars.
+- **Day and red-light modes**: a cool "photographic plate" day mode and an observatory red-light night mode. Follows the system setting until the visitor chooses.
 - **Modern Polish**:
-  - **Light & Dark mode** with smooth transitions and system preference detection (`prefers-color-scheme`).
-  - Mobile responsive drawer navigation.
+  - Section navigation that highlights where you are as you scroll.
+  - Press `/` anywhere to jump to the publication search.
   - Fast load times, zero external build tools, zero npm dependencies.
   - GitHub Pages native out-of-the-box (`.nojekyll` included).
 
@@ -38,11 +40,10 @@ academic-website/
 ├── README.md                    # Setup & GitHub Pages guide
 └── assets/
     ├── css/
-    │   ├── theme.css            # Light & Dark color variables and typography
-    │   └── style.css            # Layout, publication cards, badges, modal, timeline
+    │   └── style.css            # Colours, typography, layout and components
     ├── js/
     │   ├── content.js           # << YOUR DATA GOES HERE >>
-    │   └── main.js              # Theme switcher, BibTeX copy, filter engine, KaTeX
+    │   └── main.js              # Star chart, reading modes, filters, BibTeX dialog, KaTeX
     ├── img/
     │   ├── avatar-placeholder.svg
     │   └── favicon.svg
