@@ -2,30 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Shailendra Dabral</title>
   <meta name="description" content="Shailendra Dabral: research in astronomy, astrophysics and scientific machine learning. Publications, news, experience and CV.">
   <meta name="author" content="Shailendra Dabral">
   <meta property="og:title" content="Shailendra Dabral">
   <meta property="og:description" content="Research in astronomy, astrophysics and scientific machine learning.">
   <meta property="og:type" content="website">
-  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
-
-  <!-- Set the saved reading mode before paint to avoid a flash -->
-  <script>
-    (function () {
-      try {
-        var m = localStorage.getItem("site-mode");
-        if (!m) m = matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "day";
-        document.documentElement.setAttribute("data-mode", m);
-      } catch (e) { document.documentElement.setAttribute("data-mode", "day"); }
-    })();
-  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..650&family=Spectral:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
@@ -35,151 +25,46 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-  <a class="skip-link" href="#about">Skip to content</a>
+  <!-- Background: a still night sky with gently twinkling stars -->
+  <canvas id="cosmos" class="cosmos" aria-hidden="true"></canvas>
 
-  <header class="topbar" id="topbar">
-    <div class="topbar-inner">
-      <a href="#top" class="brand">
-        <span class="brand-mark" id="brand-initials" aria-hidden="true">SD</span>
-        <span class="brand-name" id="brand-name">Shailendra Dabral</span>
-      </a>
-      <nav class="site-nav" aria-label="Sections">
-        <a href="#about">About</a>
-        <a href="#research">Research</a>
-        <a href="#publications">Publications</a>
-        <a href="#news">News</a>
-        <a href="#experience">Experience</a>
-        <a href="#teaching">Teaching</a>
-        <a href="#service">Service</a>
-        <a href="#contact">Contact</a>
-      </nav>
-      <button class="mode-toggle" id="mode-toggle" type="button" aria-pressed="false" title="Red-light mode keeps your eyes dark-adapted, the way observatories do">
-        <span class="mode-icon" aria-hidden="true"></span>
-        <span class="mode-label">Red light</span>
+  <a class="skip-link" href="#tiles">Skip to sections</a>
+
+  <div class="start" id="start">
+    <header class="start-head">
+      <div class="identity">
+        <h1 class="name" id="profile-name">Shailendra Dabral</h1>
+        <p class="role" id="profile-role"></p>
+      </div>
+      <button type="button" class="account" id="account" data-open="about" aria-label="About me">
+        <span class="account-text">
+          <span class="account-status" id="profile-status"></span>
+          <span class="account-affil" id="profile-affiliation"></span>
+        </span>
+        <img class="account-pic" id="account-pic" src="assets/img/avatar-placeholder.svg" alt="" width="64" height="64">
       </button>
-    </div>
-  </header>
+    </header>
 
-  <!-- Hero: an interactive star atlas plate centred on Orion -->
-  <section class="hero" id="top" aria-labelledby="profile-name">
-    <canvas class="sky" id="sky" role="img" aria-label="Star chart of the Orion region. Move across it to read sky coordinates and identify bright stars."></canvas>
-    <div class="hero-inner">
-      <div class="hero-text">
-        <h1 class="hero-name" id="profile-name">Shailendra Dabral</h1>
-        <p class="hero-role" id="profile-role"></p>
-        <p class="hero-meta">
-          <a id="profile-affiliation" class="hero-affil" href="#"></a>
-          <span class="hero-status" id="profile-status"></span>
-        </p>
-      </div>
-      <div class="readout" id="readout" aria-live="off">
-        <div class="readout-coords">
-          <span><span class="readout-k">RA</span> <span id="ro-ra">5h 35m 00s</span></span>
-          <span><span class="readout-k">Dec</span> <span id="ro-dec">+0° 00′</span></span>
-        </div>
-        <div class="readout-target" id="ro-target">Move across the chart to read coordinates</div>
-      </div>
-    </div>
-  </section>
+    <main class="groups" id="tiles" aria-label="Sections"></main>
 
-  <main class="page" id="main">
-
-    <section class="sec" id="about" aria-labelledby="h-about">
-      <h2 class="sec-title" id="h-about">About</h2>
-      <div class="sec-body">
-        <div class="about">
-          <img id="profile-avatar" class="avatar" src="assets/img/avatar-placeholder.svg" alt="" width="104" height="104">
-          <div class="bio" id="profile-bio"></div>
-        </div>
-        <ul class="profile-links" id="profile-links"></ul>
-      </div>
-    </section>
-
-    <section class="sec" id="research" aria-labelledby="h-research">
-      <h2 class="sec-title" id="h-research">Research</h2>
-      <div class="sec-body">
-        <div class="research-list" id="research-list"></div>
-      </div>
-    </section>
-
-    <section class="sec" id="publications" aria-labelledby="h-pubs">
-      <h2 class="sec-title" id="h-pubs">Publications</h2>
-      <div class="sec-body">
-        <div class="pub-tools">
-          <div class="segmented" id="pub-filters" role="group" aria-label="Filter publications by type">
-            <button type="button" data-filter="all" aria-pressed="true">All <span class="count" data-count="all"></span></button>
-            <button type="button" data-filter="conference" aria-pressed="false">Conference <span class="count" data-count="conference"></span></button>
-            <button type="button" data-filter="journal" aria-pressed="false">Journal <span class="count" data-count="journal"></span></button>
-            <button type="button" data-filter="preprint" aria-pressed="false">Preprint <span class="count" data-count="preprint"></span></button>
-          </div>
-          <label class="search">
-            <span class="visually-hidden">Search publications</span>
-            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" id="pub-search" placeholder="Search titles, venues, authors" autocomplete="off">
-            <kbd aria-hidden="true">/</kbd>
-          </label>
-        </div>
-        <p class="pub-status" id="pub-status" aria-live="polite"></p>
-        <div class="pub-list" id="pub-list"></div>
-      </div>
-    </section>
-
-    <section class="sec" id="news" aria-labelledby="h-news">
-      <h2 class="sec-title" id="h-news">News</h2>
-      <div class="sec-body">
-        <ol class="entries" id="news-list"></ol>
-        <button type="button" class="text-btn" id="news-more" hidden></button>
-      </div>
-    </section>
-
-    <section class="sec" id="experience" aria-labelledby="h-exp">
-      <h2 class="sec-title" id="h-exp">Experience</h2>
-      <div class="sec-body">
-        <div class="segmented" role="tablist" aria-label="Experience or education">
-          <button type="button" role="tab" id="tab-work" aria-controls="panel-work" aria-selected="true">Positions</button>
-          <button type="button" role="tab" id="tab-edu" aria-controls="panel-edu" aria-selected="false" tabindex="-1">Education</button>
-        </div>
-        <ol class="entries tab-panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work"></ol>
-        <ol class="entries tab-panel" id="panel-edu" role="tabpanel" aria-labelledby="tab-edu" hidden></ol>
-      </div>
-    </section>
-
-    <section class="sec" id="teaching" aria-labelledby="h-teach">
-      <h2 class="sec-title" id="h-teach">Teaching</h2>
-      <div class="sec-body">
-        <ol class="entries" id="teaching-list"></ol>
-      </div>
-    </section>
-
-    <section class="sec" id="service" aria-labelledby="h-service">
-      <h2 class="sec-title" id="h-service">Service and honours</h2>
-      <div class="sec-body">
-        <h3 class="sub-title">Honours and fellowships</h3>
-        <ul class="ledger" id="honors-list"></ul>
-        <h3 class="sub-title">Peer review</h3>
-        <ul class="ledger" id="review-list"></ul>
-      </div>
-    </section>
-
-    <section class="sec" id="contact" aria-labelledby="h-contact">
-      <h2 class="sec-title" id="h-contact">Contact</h2>
-      <div class="sec-body">
-        <p class="contact-lead">For collaborations, freelance projects in scientific machine learning, or questions about my work, write to me directly.</p>
-        <div class="contact-row">
-          <a class="email-link" id="contact-email" href="#"></a>
-          <button type="button" class="btn" id="copy-email">Copy address</button>
-          <a class="btn btn-quiet" id="contact-cv" href="#" target="_blank" rel="noopener">Download CV</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
+    <footer class="start-foot">
       <p>&copy; <span id="footer-year">2026</span> <span id="footer-name">Shailendra Dabral</span>. Hosted on <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>.</p>
-      <a href="#top" class="text-btn">Back to top</a>
+    </footer>
+  </div>
+
+  <!-- Section view: opens from a tile, Windows Phone style pivot across the top -->
+  <dialog class="panel" id="panel" aria-labelledby="panel-title">
+    <div class="panel-inner">
+      <div class="panel-head">
+        <button type="button" class="back-btn" id="panel-back" aria-label="Back to start">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        </button>
+        <nav class="pivot" id="pivot" aria-label="Sections"></nav>
+      </div>
+      <h2 class="visually-hidden" id="panel-title"></h2>
+      <div class="panel-body" id="panel-body"></div>
     </div>
-  </footer>
+  </dialog>
 
   <dialog class="cite-dialog" id="cite-dialog" aria-labelledby="cite-title">
     <div class="cite-head">
@@ -196,6 +81,7 @@
   </dialog>
 
   <script src="assets/js/content.js"></script>
+  <script src="assets/js/cosmos.js"></script>
   <script src="assets/js/main.js"></script>
 </body>
 </html>

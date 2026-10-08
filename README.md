@@ -20,10 +20,10 @@ A clean, modern, zero-dependency personal website designed specifically for acad
   - Two-column timeline for Experience and Education.
   - Teaching & mentoring section.
   - Program Committee (PC) reviewing & honors record.
-- **Interactive star-atlas header**: a chart of the Orion region drawn from real star positions. Move the pointer (or tap) to read RA/Dec and identify bright stars.
-- **Day and red-light modes**: a cool "photographic plate" day mode and an observatory red-light night mode. Follows the system setting until the visitor chooses.
+- **Windows 8 style Start screen**: frosted-glass tiles grouped into research, career and connect. Large tiles are live and cycle through your papers, news and positions. Tiles tilt toward where you press, like Windows 8.
+- **Night-sky background** (`assets/js/cosmos.js`): a black gradient with a faint Milky Way band and thousands of stars coloured by temperature. A few bright stars twinkle gently; twinkling stops for visitors who ask their system for reduced motion.
+- **Section views**: each tile opens a glass panel with a swipeable list of sections across the top. Every section has its own link (for example `/#publications` or `/#experience:edu`), and the browser back button returns to the Start screen.
 - **Modern Polish**:
-  - Section navigation that highlights where you are as you scroll.
   - Press `/` anywhere to jump to the publication search.
   - Fast load times, zero external build tools, zero npm dependencies.
   - GitHub Pages native out-of-the-box (`.nojekyll` included).
@@ -43,7 +43,8 @@ academic-website/
     │   └── style.css            # Colours, typography, layout and components
     ├── js/
     │   ├── content.js           # << YOUR DATA GOES HERE >>
-    │   └── main.js              # Star chart, reading modes, filters, BibTeX dialog, KaTeX
+    │   ├── cosmos.js            # Night-sky background
+    │   └── main.js              # Tiles, live tiles, section panels, filters, BibTeX, KaTeX
     ├── img/
     │   ├── avatar-placeholder.svg
     │   └── favicon.svg
