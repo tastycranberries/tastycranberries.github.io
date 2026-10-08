@@ -21,7 +21,7 @@ A clean, modern, zero-dependency personal website designed specifically for acad
   - Teaching & mentoring section.
   - Program Committee (PC) reviewing & honors record.
 - **Windows 8 style Start screen**: frosted-glass tiles grouped into research, career and connect. Large tiles are live and cycle through your papers, news and positions. Tiles tilt toward where you press, like Windows 8.
-- **Night-sky background** (`assets/js/cosmos.js`): a black gradient with a faint Milky Way band and thousands of stars coloured by temperature. A few bright stars twinkle gently; twinkling stops for visitors who ask their system for reduced motion.
+- **Dark and light themes**: a black gradient by default and a bright light theme, switched with the toggle at the top right. In light mode every tile changes to a pale frosted version of its colour with deep-toned text. The site follows the visitor's system setting until they choose, then remembers their choice.
 - **Section views**: each tile opens a glass panel with a swipeable list of sections across the top. Every section has its own link (for example `/#publications` or `/#experience:edu`), and the browser back button returns to the Start screen.
 - **Modern Polish**:
   - Press `/` anywhere to jump to the publication search.
@@ -43,7 +43,6 @@ academic-website/
     │   └── style.css            # Colours, typography, layout and components
     ├── js/
     │   ├── content.js           # << YOUR DATA GOES HERE >>
-    │   ├── cosmos.js            # Night-sky background
     │   └── main.js              # Tiles, live tiles, section panels, filters, BibTeX, KaTeX
     ├── img/
     │   ├── avatar-placeholder.svg
@@ -186,5 +185,5 @@ If you own a custom domain (e.g., `www.yourname.com`):
 
 ## After updating the site
 
-`index.html` loads the stylesheet and scripts with a version tag, for example `style.css?v=2026-10-09`. When you change `style.css`, `main.js`, `cosmos.js` or `content.js`, change that version in `index.html` too (all four places), for example from `2026-10-09.2` to today's date. Browsers then fetch the new files immediately instead of mixing them with older saved copies.
+`index.html` loads the stylesheet and scripts with a version tag, for example `style.css?v=2026-10-09`. When you change `style.css`, `main.js` or `content.js`, change that version in `index.html` too (all three places), for example from `2026-10-09.3` to today's date. Browsers then fetch the new files immediately instead of mixing them with older saved copies.
 

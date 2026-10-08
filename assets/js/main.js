@@ -31,6 +31,7 @@
   };
 
   document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
     renderHead();
     renderTiles();
     initTiles();
@@ -39,6 +40,34 @@
     startLiveTiles();
     routeFromHash(false);
   });
+
+  /* ---------------- Theme (dark / light) ---------------- */
+  function initTheme() {
+    const root = document.documentElement;
+    const sw = $("#theme-switch");
+    const meta = $('meta[name="theme-color"]');
+    const apply = (t, animate) => {
+      if (animate && !reduceMotion) {
+        root.classList.add("theme-anim");
+        setTimeout(() => root.classList.remove("theme-anim"), 450);
+      }
+      root.setAttribute("data-theme", t);
+      sw.setAttribute("aria-checked", String(t === "light"));
+      if (meta) meta.content = t === "light" ? "#F3F5F9" : "#000000";
+    };
+    apply(root.getAttribute("data-theme") === "light" ? "light" : "dark", false);
+    sw.addEventListener("click", () => {
+      const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      apply(next, true);
+      try { localStorage.setItem("site-theme", next); } catch (e) { /* storage unavailable */ }
+    });
+    // Follow the system setting until the visitor picks a theme themselves
+    matchMedia("(prefers-color-scheme: light)").addEventListener("change", (e) => {
+      let saved = null;
+      try { saved = localStorage.getItem("site-theme"); } catch (err) { /* ignore */ }
+      if (!saved) apply(e.matches ? "light" : "dark", true);
+    });
+  }
 
   /* ---------------- Header ---------------- */
   function renderHead() {

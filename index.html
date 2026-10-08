@@ -10,7 +10,17 @@
   <meta property="og:description" content="Research in astronomy, astrophysics and scientific machine learning.">
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#000000">
-  <meta name="color-scheme" content="dark">
+  <meta name="color-scheme" content="dark light">
+
+  <!-- Apply the saved (or system) theme before the page paints -->
+  <script>
+    (function () {
+      var t;
+      try { t = localStorage.getItem("site-theme"); } catch (e) {}
+      if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
   <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,12 +32,9 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
 
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-09.2">
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-09.3">
 </head>
 <body>
-  <!-- Background: a still night sky with gently twinkling stars -->
-  <canvas id="cosmos" class="cosmos" aria-hidden="true"></canvas>
-
   <a class="skip-link" href="#tiles">Skip to sections</a>
 
   <div class="start" id="start">
@@ -36,13 +43,19 @@
         <h1 class="name" id="profile-name">Shailendra Dabral</h1>
         <p class="role" id="profile-role"></p>
       </div>
-      <button type="button" class="account" id="account" data-open="about" aria-label="About me">
+      <div class="head-right">
+        <button type="button" class="theme-switch" id="theme-switch" role="switch" aria-checked="false">
+          <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+          <span class="switch-label">Light mode</span>
+        </button>
+        <button type="button" class="account" id="account" data-open="about" aria-label="About me">
         <span class="account-text">
           <span class="account-status" id="profile-status"></span>
           <span class="account-affil" id="profile-affiliation"></span>
         </span>
         <img class="account-pic" id="account-pic" src="assets/img/avatar-placeholder.svg" alt="" width="64" height="64">
-      </button>
+        </button>
+      </div>
     </header>
 
     <main class="groups" id="tiles" aria-label="Sections"></main>
@@ -80,8 +93,7 @@
     </div>
   </dialog>
 
-  <script src="assets/js/content.js?v=2026-10-09.2"></script>
-  <script src="assets/js/cosmos.js?v=2026-10-09.2"></script>
-  <script src="assets/js/main.js?v=2026-10-09.2"></script>
+  <script src="assets/js/content.js?v=2026-10-09.3"></script>
+  <script src="assets/js/main.js?v=2026-10-09.3"></script>
 </body>
 </html>
