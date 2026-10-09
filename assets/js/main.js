@@ -284,6 +284,7 @@
       if (b && b.dataset.section !== current) openPanel(b.dataset.section, { replace: true });
     });
     $("#panel-back").addEventListener("click", requestClose);
+    initPivotGlide();
     p.addEventListener("cancel", (e) => { e.preventDefault(); if (suppressCancel) { suppressCancel = false; return; } requestClose(); });
 
     // Swipe left/right between sections on touch screens
@@ -315,6 +316,51 @@
     });
   }
 
+  /* Section strip glides with the pointer: near the left edge the first
+     section sits at the left edge; near the right edge the last section
+     sits at the right edge. Positions in between map proportionally. */
+  function initPivotGlide() {
+    const pv = $("#pivot");
+    const head = $(".panel-head");
+    let target = null, raf = null;
+
+    const updateFades = () => {
+      const max = pv.scrollWidth - pv.clientWidth;
+      pv.classList.toggle("more-left", pv.scrollLeft > 2);
+      pv.classList.toggle("more-right", pv.scrollLeft < max - 2);
+    };
+    pv.addEventListener("scroll", updateFades, { passive: true });
+    window.addEventListener("resize", updateFades);
+    new ResizeObserver(updateFades).observe(pv);
+
+    let lastT = 0;
+    const glide = (now) => {
+      const dt = lastT ? Math.min(64, now - lastT) : 16;
+      lastT = now;
+      const d = target - pv.scrollLeft;
+      if (Math.abs(d) < 0.5) { pv.scrollLeft = target; raf = null; lastT = 0; return; }
+      // time-based easing (~110 ms time constant): same feel at any frame rate
+      let step = d * (reduceMotion ? 1 : 1 - Math.exp(-dt / 110));
+      if (Math.abs(step) < 1) step = Math.sign(d) * Math.min(1, Math.abs(d));   // browsers round tiny scroll steps to 0
+      pv.scrollLeft += step;
+      raf = requestAnimationFrame(glide);
+    };
+
+    const fine = matchMedia("(hover: hover) and (pointer: fine)");
+    head.addEventListener("pointermove", (e) => {
+      if (!fine.matches || e.pointerType !== "mouse") return;
+      const max = pv.scrollWidth - pv.clientWidth;
+      if (max <= 0) return;
+      const r = pv.getBoundingClientRect();
+      // a little dead zone at each end so both extremes are easy to reach
+      const zone = Math.min(80, r.width * 0.12);
+      const t = Math.min(1, Math.max(0, (e.clientX - r.left - zone) / (r.width - zone * 2)));
+      target = Math.round(t * max);
+      if (!raf) raf = requestAnimationFrame(glide);
+    });
+    window.__pivotFades = updateFades;
+  }
+
   function routeFromHash(fromHistory) {
     const key = decodeURIComponent(location.hash.slice(1));
     const base = key.split(":")[0];
@@ -335,7 +381,7 @@
     $$("#pivot button").forEach((b) => {
       const on = b.dataset.section === name;
       b.setAttribute("aria-current", String(on));
-      if (on) { const smooth = p.open && !reduceMotion; requestAnimationFrame(() => { const pv = $("#pivot"); pv.scrollTo({ left: Math.max(0, b.offsetLeft - pv.offsetLeft - 8), behavior: smooth ? "smooth" : "auto" }); }); }
+      if (on) { const smooth = p.open && !reduceMotion; requestAnimationFrame(() => { const pv = $("#pivot"); pv.scrollTo({ left: Math.max(0, b.offsetLeft - pv.offsetLeft - 8), behavior: smooth ? "smooth" : "auto" }); if (window.__pivotFades) window.__pivotFades(); }); }
     });
 
     const body = $("#panel-body");
