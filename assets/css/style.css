@@ -54,7 +54,7 @@
   --tile-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 10px 30px -12px rgba(0, 0, 0, 0.7);
   --tile-text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
 
-  --panel-bg: rgba(3, 4, 10, 0.93);
+  --panel-bg: rgba(3, 4, 10, 0.82);
   --panel-head: rgba(3, 4, 10, 0.97);
   --pivot-dim: rgba(255, 255, 255, 0.45);
   --pivot-hover: rgba(255, 255, 255, 0.68);
@@ -65,6 +65,11 @@
   --dialog-bg: #0B0D16;
   --code-bg: rgba(0, 0, 0, 0.4);
   --backdrop: rgba(0, 0, 0, 0.6);
+
+  --glow-a: 0.34;               /* strength of the colour glows behind the glass */
+  --glass-blur: 18px;
+  --glass-edge: rgba(255, 255, 255, 0.28);
+  --glass-edge-soft: rgba(255, 255, 255, 0.06);
 }
 
 /* ---------- Light theme ---------- */
@@ -87,14 +92,14 @@
   /* light frosted tiles: pale wash of each Metro colour on white glass */
   --tile-fill-a: 0.2;
   --tile-fill-b: 0.07;
-  --tile-base: rgba(255, 255, 255, 0.78);
+  --tile-base: rgba(255, 255, 255, 0.58);
   --tile-border-hover: rgba(16, 19, 31, 0.3);
   --tile-shine: rgba(255, 255, 255, 0.75);
   --tile-glare: rgba(255, 255, 255, 0.55);
   --tile-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(16, 19, 31, 0.06), 0 10px 26px -16px rgba(16, 19, 31, 0.35);
   --tile-text-shadow: none;
 
-  --panel-bg: rgba(246, 247, 251, 0.95);
+  --panel-bg: rgba(246, 247, 251, 0.82);
   --panel-head: rgba(246, 247, 251, 0.98);
   --pivot-dim: rgba(16, 19, 31, 0.38);
   --pivot-hover: rgba(16, 19, 31, 0.62);
@@ -105,6 +110,11 @@
   --dialog-bg: #FFFFFF;
   --code-bg: #F1F3F7;
   --backdrop: rgba(16, 19, 31, 0.35);
+
+  --glow-a: 0.3;
+  --glass-blur: 18px;
+  --glass-edge: rgba(255, 255, 255, 0.95);
+  --glass-edge-soft: rgba(255, 255, 255, 0.35);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -323,8 +333,8 @@ a { color: inherit; }
   margin: 0; padding: 0; border: 0;
   color: var(--text);
   background: var(--panel-bg);
-  backdrop-filter: blur(26px) saturate(120%);
-  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  backdrop-filter: blur(34px) saturate(160%);
+  -webkit-backdrop-filter: blur(34px) saturate(160%);
   overflow: hidden;
 }
 .panel::backdrop { background: transparent; }
@@ -363,11 +373,15 @@ a { color: inherit; }
 .back-btn:active { transform: scale(.9); }
 
 .pivot {
-  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
-  mask-image: linear-gradient(90deg, #000 85%, transparent);
+  /* fades appear only on a side that still has sections out of view */
+  --fade-l: 0px; --fade-r: 0px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent 100%);
   display: flex; gap: 1.6rem; overflow-x: auto; scrollbar-width: none;
   min-width: 0; padding: .2rem 0;
 }
+.pivot.more-left  { --fade-l: 3rem; }
+.pivot.more-right { --fade-r: 3rem; }
 .pivot::-webkit-scrollbar { display: none; }
 .pivot button {
   flex-shrink: 0; background: none; border: 0; padding: 0; cursor: pointer;
@@ -607,3 +621,72 @@ html.theme-anim body, html.theme-anim .tile, html.theme-anim .panel {
 }
 /* keep the "about me" label off the photo */
 .tile:has(.face--photo) .tile-label { left: calc(50% + .9rem); }
+
+
+/* =====================================================================
+   Glassmorphism
+   Soft colour glows sit behind everything; tiles, panels and controls
+   are frosted glass that blurs and picks up that colour.
+   ===================================================================== */
+.aurora {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+}
+.aurora span {
+  position: absolute; width: 52vmax; height: 52vmax; border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(var(--c), var(--glow-a)) 0%, rgba(var(--c), 0) 68%);
+  will-change: transform;
+}
+.aurora span:nth-child(1) { --c: var(--cobalt);  left: -14vmax; top: -10vmax; }
+.aurora span:nth-child(2) { --c: var(--magenta); left: 30vw;    top: -18vmax; }
+.aurora span:nth-child(3) { --c: var(--teal);    left: -18vmax; bottom: -22vmax; }
+.aurora span:nth-child(4) { --c: var(--violet);  right: -16vmax; bottom: -14vmax; }
+@media (prefers-reduced-motion: no-preference) {
+  .aurora span:nth-child(1) { animation: drift-a 38s ease-in-out infinite alternate; }
+  .aurora span:nth-child(2) { animation: drift-b 46s ease-in-out infinite alternate; }
+  .aurora span:nth-child(3) { animation: drift-b 42s ease-in-out infinite alternate-reverse; }
+  .aurora span:nth-child(4) { animation: drift-a 50s ease-in-out infinite alternate-reverse; }
+}
+@keyframes drift-a { to { transform: translate(8vmax, 6vmax) scale(1.08); } }
+@keyframes drift-b { to { transform: translate(-7vmax, 8vmax) scale(0.94); } }
+
+/* frosted tiles */
+.tile {
+  backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(170%);
+  box-shadow:
+    inset 1px 1px 0 var(--glass-edge-soft),
+    inset 0 1px 0 var(--glass-edge),
+    var(--tile-shadow);
+}
+
+/* frosted controls inside panels */
+.search, .segmented button, .link-list a, .pub-abstract p, .icon-btn {
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+.panel-head {
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+/* frosted citation dialog */
+.cite-dialog {
+  background: color-mix(in srgb, var(--dialog-bg) 82%, transparent);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  box-shadow: inset 0 1px 0 var(--glass-edge), 0 30px 80px -20px rgba(0, 0, 0, .55);
+}
+
+/* frosted header controls */
+.theme-switch .switch-track, .account-pic {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* the start screen content sits above the glows */
+.start { z-index: 1; }
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tile { background-color: color-mix(in srgb, var(--bg) 70%, transparent); }
+  .cite-dialog { background: var(--dialog-bg); }
+}
