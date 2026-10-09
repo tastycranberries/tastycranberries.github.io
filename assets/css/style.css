@@ -394,7 +394,7 @@ a { color: inherit; }
 .panel-body {
   max-width: 50rem; margin-top: 1.5rem;
 }
-.panel-body.is-switching { animation: pivot-in .45s var(--ease-metro) both; }
+.panel-body.is-switching { animation: none; }   /* items enter one by one instead (see fx-enter) */
 @keyframes pivot-in { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: none; } }
 
 .lead { font-size: 1.2rem; font-weight: 300; line-height: 1.6; margin: 0 0 1.2rem; }
@@ -689,4 +689,79 @@ html.theme-anim body, html.theme-anim .tile, html.theme-anim .panel {
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .tile { background-color: color-mix(in srgb, var(--bg) 70%, transparent); }
   .cite-dialog { background: var(--dialog-bg); }
+}
+
+
+/* =====================================================================
+   Special effects
+   ===================================================================== */
+:root, :root[data-theme="dark"] {
+  --reveal-edge: rgba(255, 255, 255, 0.85);
+  --reveal-fill: rgba(255, 255, 255, 0.07);
+  --ripple: rgba(255, 255, 255, 0.32);
+  --glint: rgba(255, 255, 255, 0.28);
+}
+:root[data-theme="light"] {
+  --reveal-fill: rgba(255, 255, 255, 0.35);
+  --glint: rgba(255, 255, 255, 0.85);
+}
+/* in light mode each tile's light takes that tile's own colour */
+:root[data-theme="light"] .tile {
+  --reveal-edge: rgba(var(--tint), 0.9);
+  --ripple: rgba(var(--tint), 0.22);
+}
+
+/* Reveal: a light that follows the pointer, shown on the tile border and
+   very faintly on the glass, so nearby tiles light up as you approach */
+.tile-reveal {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  border-radius: inherit;
+}
+.tile-reveal::before, .tile-reveal::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+}
+.tile-reveal::before {          /* edge light */
+  padding: 1.5px;
+  background: radial-gradient(170px circle at var(--lx, -999px) var(--ly, -999px), var(--reveal-edge), transparent 72%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.tile-reveal::after {           /* faint light on the glass itself */
+  background: radial-gradient(220px circle at var(--lx, -999px) var(--ly, -999px), var(--reveal-fill), transparent 70%);
+}
+
+/* Press ripple */
+.tile-ripple {
+  position: absolute; z-index: 4; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, transparent 38%, var(--ripple) 52%, transparent 66%);
+  transform: scale(0); opacity: 1;
+  animation: tile-ripple .65s cubic-bezier(.2, .7, .3, 1) forwards;
+}
+@keyframes tile-ripple { to { transform: scale(1); opacity: 0; } }
+
+/* Live-tile glint */
+.tile-sweep {
+  position: absolute; inset: -20% -60%; z-index: 4; pointer-events: none;
+  background: linear-gradient(105deg, transparent 42%, var(--glint) 50%, transparent 58%);
+  transform: translateX(-70%); opacity: 0;
+}
+.tile.is-glint .tile-sweep { animation: tile-glint 1.1s ease-out .15s; }
+@keyframes tile-glint {
+  0%   { transform: translateX(-70%); opacity: 1; }
+  100% { transform: translateX(70%);  opacity: 1; }
+}
+
+/* Panel entrance choreography */
+.fx-enter { animation: fx-enter .55s var(--ease-metro) both; animation-delay: var(--enter-delay, 0ms); }
+@keyframes fx-enter {
+  from { opacity: 0; transform: translateX(36px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Parallax glows: transform is set from script */
+.aurora { will-change: transform; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tile-sweep, .tile-ripple { display: none; }
 }

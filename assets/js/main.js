@@ -35,6 +35,7 @@
     renderHead();
     renderTiles();
     initTiles();
+    initEffects();
     initPanel();
     initCite();
     startLiveTiles();
@@ -94,7 +95,7 @@
 
   function tile({ open, href, size = "", tint, label, badge, faces, aria, live = true, interval = 0 }) {
     const cls = `tile ${size ? "tile--" + size : ""} t-${tint}${live && faces.length > 1 ? " is-live" : ""}`;
-    const inner = `<span class="faces" aria-hidden="true">${faces.join("")}</span>
+    const inner = `<span class="tile-reveal" aria-hidden="true"></span><span class="tile-sweep" aria-hidden="true"></span><span class="faces" aria-hidden="true">${faces.join("")}</span>
       <span class="tile-label" aria-hidden="true">${esc(label)}</span>
       ${badge !== undefined && badge !== "" ? `<span class="tile-badge" aria-hidden="true">${esc(badge)}</span>` : ""}`;
     if (href) {
@@ -205,7 +206,7 @@
         t.style.setProperty("--my", `${e.clientY - r.top}px`);
         if (t.classList.contains("is-pressed")) tilt(t, e);
       });
-      t.addEventListener("pointerdown", (e) => { t.classList.add("is-pressed"); tilt(t, e); });
+      t.addEventListener("pointerdown", (e) => { t.classList.add("is-pressed"); tilt(t, e); ripple(t, e); });
       const release = () => { t.classList.remove("is-pressed"); t.style.setProperty("--rx", "0deg"); t.style.setProperty("--ry", "0deg"); t.style.setProperty("--s", "1"); };
       t.addEventListener("pointerup", release);
       t.addEventListener("pointerleave", release);
@@ -228,6 +229,73 @@
     t.style.setProperty("--ry", `${(x * k * 2).toFixed(2)}deg`);
     t.style.setProperty("--rx", `${(-y * k * 2).toFixed(2)}deg`);
     t.style.setProperty("--s", edge < 0.22 ? "0.95" : "0.98");
+  }
+
+  /* =====================================================================
+     Special effects
+       - reveal: tile edges light up near the pointer (Fluent "Reveal")
+       - ripple: a ring of light spreads from where a tile is pressed
+       - glint: a shine sweeps across a live tile when it flips
+       - choreography: panel content enters item by item
+       - parallax: background glows drift gently against the pointer
+     ===================================================================== */
+  function initEffects() {
+    const fine = matchMedia("(hover: hover) and (pointer: fine)");
+    const tiles = $$(".tile");
+    const aurora = $(".aurora");
+    let px = -9999, py = -9999, queued = false;
+    let ax = 0, ay = 0, tx = 0, ty = 0, glideRaf = null;
+
+    const paint = () => {
+      queued = false;
+      for (const t of tiles) {
+        const r = t.getBoundingClientRect();
+        t.style.setProperty("--lx", `${px - r.left}px`);
+        t.style.setProperty("--ly", `${py - r.top}px`);
+      }
+    };
+    const drift = () => {
+      ax += (tx - ax) * 0.06; ay += (ty - ay) * 0.06;
+      if (aurora) aurora.style.transform = `translate3d(${ax.toFixed(2)}px, ${ay.toFixed(2)}px, 0)`;
+      glideRaf = Math.abs(tx - ax) + Math.abs(ty - ay) > 0.2 ? requestAnimationFrame(drift) : null;
+    };
+
+    document.addEventListener("pointermove", (e) => {
+      if (!fine.matches || e.pointerType !== "mouse") return;
+      px = e.clientX; py = e.clientY;
+      if (!queued) { queued = true; requestAnimationFrame(paint); }
+      if (!reduceMotion && !panel().open) {
+        tx = (0.5 - e.clientX / innerWidth) * 40;   // up to 20px each way
+        ty = (0.5 - e.clientY / innerHeight) * 40;
+        if (!glideRaf) glideRaf = requestAnimationFrame(drift);
+      }
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => { px = py = -9999; paint(); });
+    window.addEventListener("scroll", () => { if (!queued && px > -9999) { queued = true; requestAnimationFrame(paint); } }, { passive: true });
+  }
+
+  function ripple(t, e) {
+    if (reduceMotion) return;
+    const r = t.getBoundingClientRect();
+    const d = Math.hypot(Math.max(e.clientX - r.left, r.right - e.clientX), Math.max(e.clientY - r.top, r.bottom - e.clientY)) * 2;
+    const el = document.createElement("span");
+    el.className = "tile-ripple";
+    el.setAttribute("aria-hidden", "true");
+    el.style.width = el.style.height = `${d}px`;
+    el.style.left = `${e.clientX - r.left - d / 2}px`;
+    el.style.top = `${e.clientY - r.top - d / 2}px`;
+    t.appendChild(el);
+    el.addEventListener("animationend", () => el.remove(), { once: true });
+  }
+
+  function choreograph(body) {
+    if (reduceMotion) return;
+    const items = $$(".pub-tools, .pub-status, .pub-year, .research-item, .entries > .entry, .segmented[role=tablist], .sub-title, .ledger li, .about, .link-list li, .lead, .email-link, .contact-row", body)
+      .filter((el) => !el.closest("[hidden]"));
+    items.forEach((el, i) => {
+      el.style.setProperty("--enter-delay", `${Math.min(i, 14) * 45}ms`);
+      el.classList.remove("fx-enter"); void el.offsetWidth; el.classList.add("fx-enter");
+    });
   }
 
   /* ---------------- Live tiles ---------------- */
@@ -259,6 +327,7 @@
         if (!hover && !livePaused && !document.hidden) {
           idx += 1;
           faces.style.transform = `translateY(${-idx * 100}%)`;
+          t.classList.remove("is-glint"); void t.offsetWidth; t.classList.add("is-glint");
         }
         setTimeout(step, wait);
       };
@@ -388,6 +457,7 @@
     body.innerHTML = "";
     s.render(body, tab);
     renderMath(body);
+    choreograph(body);
     $(".panel-inner", p).scrollTop = 0;
 
     if (switching) {
