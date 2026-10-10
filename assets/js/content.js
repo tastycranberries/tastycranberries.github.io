@@ -235,6 +235,11 @@ const ACADEMIC_PROFILE = {
       org: "Indian Institute of Technology Indore",
       desc: "Thesis: <em>Advance techniques in Remote Sensing Change Detection(Developed Model for benchmarking in domain of Change detection and also worked on developing Multiple Hybrid machine learning models for infrastructure monitoring )</em>.<br>Advisor: Associate Prof. Unmesh Khati."
     },
+    { 
+      period: "2018 - 2020",
+      degree: "Masters in Physical Science",
+      org: "Hemwati Nandan Bahuguna Central University"
+     },
     {
       period: "2015 — 2018",
       degree: "Bachelors in Mathematics, Physics and Computer Science",
