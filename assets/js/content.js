@@ -30,10 +30,10 @@ const ACADEMIC_PROFILE = {
     { label: "Google Scholar", icon: "fa-solid fa-graduation-cap", url: "https://scholar.google.com" },
     { label: "arXiv", icon: "fa-solid fa-book-open", url: "https://arxiv.org" },
     { label: "ORCID", icon: "fa-brands fa-orcid", url: "https://orcid.org" },
-    { label: "GitHub", icon: "fa-brands fa-github", url: "https://github.com/tastycranberries" },
+    { label: "GitHub", icon: "fa-brands fa-github", url: "https://github.com/ShailendraDabral" },
     { label: "Twitter / X", icon: "fa-brands fa-x-twitter", url: "https://twitter.com" },
     { label: "LinkedIn", icon: "fa-brands fa-linkedin", url: "https://linkedin.com" },
-    { label: "Email", icon: "fa-solid fa-envelope", url: "mailto:alex.vance@stanford.edu" },
+    { label: "Email", icon: "fa-solid fa-envelope", url: "mailto:ms2404121005@alum.iiti.ac.in" },
     { label: "Curriculum Vitae", icon: "fa-solid fa-file-pdf", url: "assets/pdf/cv-placeholder.pdf", isCv: true }
   ],
 
@@ -236,10 +236,10 @@ const ACADEMIC_PROFILE = {
       desc: "Dissertation: <em>Representation Learning and Coordination in High-Dimensional Multi-Agent Systems</em>.<br>Advisor: Prof. Marcus Chen. Recipient of the CMU Graduate Research Fellowship."
     },
     {
-      period: "2015 — 2019",
-      degree: "B.S. in Computer Science & Applied Mathematics",
-      org: "University of Washington",
-      desc: "Summa Cum Laude. Undergraduate research in robotics perception with Prof. Robert Thorne."
+      period: "2015 — 2018",
+      degree: "Bachelors in Mathematics, Physics and Computer Science",
+      org: "Hemwati Nandan Bahuguna Central University",
+      desc: "Summa Cum Laude. Gained experience in Pure mathematics, Physics and Computer Science."
     }
   ],
 
