@@ -230,16 +230,16 @@ const ACADEMIC_PROFILE = {
 
   education: [
     {
-      period: "2019 — 2024",
-      degree: "Ph.D. in Computer Science",
-      org: "Carnegie Mellon University",
-      desc: "Dissertation: <em>Representation Learning and Coordination in High-Dimensional Multi-Agent Systems</em>.<br>Advisor: Prof. Marcus Chen. Recipient of the CMU Graduate Research Fellowship."
+      period: "2024 — 2026",
+      degree: "MS-Research in Space Science and Engineering",
+      org: "Indian Institute of Technology Indore",
+      desc: "Thesis: <em>Advance techniques in Remote Sensing Change Detection(Developed Model for benchmarking in domain of Change detection and also worked on developing Multiple Hybrid machine learning models for infrastructure monitoring )</em>.<br>Advisor: Associate Prof. Unmesh Khati."
     },
     {
       period: "2015 — 2018",
       degree: "Bachelors in Mathematics, Physics and Computer Science",
       org: "Hemwati Nandan Bahuguna Central University",
-      desc: "Summa Cum Laude. Gained experience in Pure mathematics, Physics and Computer Science."
+      desc: "Gained experience in Pure mathematics, Physics and Computer Science."
     }
   ],
 
