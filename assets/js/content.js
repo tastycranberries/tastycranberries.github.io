@@ -251,25 +251,21 @@ const ACADEMIC_PROFILE = {
   // ---------------- Teaching & Mentoring ----------------
   teaching: [
     {
-      code: "CS 234",
-      semester: "Winter 2026",
-      title: "Reinforcement Learning",
-      role: "Guest Lecturer",
-      desc: "Delivered lectures on model-based reinforcement learning and modern policy gradient formulations."
-    },
-    {
-      code: "CS 15-780",
-      semester: "Fall 2023",
-      title: "Graduate Artificial Intelligence",
-      role: "Head Teaching Assistant",
-      desc: "Managed course projects, designed homework assignments on causal reasoning, and led weekly recitations."
-    },
-    {
-      code: "CS 15-281",
-      semester: "Spring 2022",
-      title: "Artificial Intelligence: Representation & Problem Solving",
+      code: "PH 107",
+      semester: "Spring 2025",
+      title: "Electromagnetism",
       role: "Teaching Assistant",
-      desc: "Mentored over 140 undergraduate students through classical search, MDPs, and game tree algorithms."
+      desc: "Delivered lectures on Electric and Magnetic Potentials, Dielectrics, Maxwells equations etc."
+    },
+    {
+      code: "AA 607",
+      semester: "Autumn 2025",
+      title: "Remote Sensing Earth Observation",
+      role: "Teaching Assistant",
+      desc: "Managed course projects and exams, led lab classes each week throughout the course ."
+    },
+    {
+
     }
   ],
 
